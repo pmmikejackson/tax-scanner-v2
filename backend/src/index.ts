@@ -26,6 +26,7 @@ app.use(helmet())
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'https://taxscanner.vercel.app', // Production domain
     'https://taxscanner-j7r3o67qc-pmmikejacksons-projects.vercel.app',
     'https://taxscanner-rl24lhgop-pmmikejacksons-projects.vercel.app',
     'https://taxscanner-ep5jp3xcv-pmmikejacksons-projects.vercel.app',
