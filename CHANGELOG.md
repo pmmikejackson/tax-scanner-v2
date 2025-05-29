@@ -5,6 +5,28 @@ All notable changes to Tax Scanner v2 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-01-XX
+
+### Added
+- **User Guide System**: Comprehensive user guide with friendly, conversational language
+  - New `/guide` page with step-by-step instructions for all features
+  - PDF generation system with downloadable user guide
+  - User guide links in hero section and info section of main page
+  - Covers GPS location, manual selection, understanding results, mobile usage, and troubleshooting
+
+### Fixed
+- **Location Detection Error Handling**: Improved user experience and debugging capabilities
+  - Removed debug alert pop-ups that interrupted user workflow
+  - Added specific error messages showing exact location that failed lookup
+  - Better guidance when location detection works but tax data not found in database
+  - Form auto-populates even when tax lookup fails to help manual correction
+
+### Added (Debug Tools)
+- **Location Detection Testing**: New debug tools for troubleshooting location issues
+  - "Test Location Detection" button to see detected location without tax lookup
+  - Location info display showing format: "Detected: Dallas, Dallas County, Texas"
+  - Enhanced console logging for better debugging information
+
 ## [0.1.4] - 2025-05-29
 
 ### Fixed
