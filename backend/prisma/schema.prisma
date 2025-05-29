@@ -75,7 +75,7 @@ model TaxRateHistory {
 
 model DataSource {
   id            String   @id @default(cuid())
-  source        String   // 'texas_comptroller', 'manual', etc.
+  source        String   @unique // 'texas_comptroller', 'manual', etc.
   lastUpdated   DateTime
   recordsCount  Int      @default(0)
   status        String   // 'success', 'error', 'in_progress'
