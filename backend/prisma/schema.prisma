@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model State {
+  id        String   @id @default(cuid())
+  code      String   @unique // TX, CA, etc.
+  name      String   // Texas, California, etc.
+  taxRate   Float    // State sales tax rate
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  counties County[]
+
+  @@map("states")
+}
+
+model County {
+  id        String   @id @default(cuid())
+  name      String
+  taxRate   Float    // County sales tax rate
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  stateId String
+  state   State  @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  cities City[]
+
+  @@unique([stateId, name])
+  @@map("counties")
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  taxRate   Float    // City sales tax rate
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  countyId String
+  county   County @relation(fields: [countyId], references: [id], onDelete: Cascade)
+
+  @@unique([countyId, name])
+  @@map("cities")
+}
+
+model TaxRateHistory {
+  id            String   @id @default(cuid())
+  entityType    String   // 'state', 'county', or 'city'
+  entityId      String   // Reference to state, county, or city
+  entityName    String   // Name for easier querying
+  oldTaxRate    Float?   // Previous tax rate (null for new entries)
+  newTaxRate    Float    // New tax rate
+  changeReason  String?  // Reason for the change
+  effectiveDate DateTime // When this rate becomes effective
+  sourceUrl     String?  // URL of the official source
+  createdAt     DateTime @default(now())
+
+  @@map("tax_rate_history")
+}
+
+model DataSource {
+  id            String   @id @default(cuid())
+  source        String   // 'texas_comptroller', 'manual', etc.
+  lastUpdated   DateTime
+  recordsCount  Int      @default(0)
+  status        String   // 'success', 'error', 'in_progress'
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@map("data_sources")
+} 
