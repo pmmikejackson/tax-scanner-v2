@@ -119,6 +119,40 @@ router.post('/import-official-data', async (req: Request, res: Response) => {
   }
 })
 
+// Simple location test endpoint (Texas coordinates fallback)
+router.get('/location-test', async (req: Request, res: Response) => {
+  try {
+    const { lat, lng } = req.query
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'Missing required parameters: lat, lng' })
+    }
+
+    const latitude = parseFloat(lat as string)
+    const longitude = parseFloat(lng as string)
+
+    // Simple Texas bounds check (rough approximation)
+    if (latitude >= 25.8 && latitude <= 36.5 && longitude >= -106.6 && longitude <= -93.5) {
+      // For testing, return Dallas as fallback for any Texas coordinates
+      const taxRates = await taxService.getTaxRates('TX', 'Dallas', 'Dallas')
+      
+      if (taxRates) {
+        res.json({
+          ...taxRates,
+          note: 'Fallback location used - Dallas, TX'
+        })
+      } else {
+        res.status(404).json({ error: 'Fallback location data not found' })
+      }
+    } else {
+      res.status(400).json({ error: 'Coordinates outside Texas bounds' })
+    }
+  } catch (error) {
+    logger.error('Error in location test:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Debug endpoint to check API key status
 router.get('/debug', async (req: Request, res: Response) => {
   try {

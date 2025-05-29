@@ -80,12 +80,14 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
     try {
       setIsLoadingData(true)
       setError(null)
+      console.log(`Loading cities for state: ${stateCode}, county: ${countyName}`)
       const citiesData = await apiClient.getCities(stateCode, countyName)
+      console.log(`Loaded ${citiesData.length} cities:`, citiesData)
       setCities(citiesData)
       setSelectedCity('')
     } catch (err) {
       console.error('Error loading cities:', err)
-      setError('Failed to load cities. Please try again.')
+      setError(`Failed to load cities for ${countyName}. Please try again.`)
       setCities([])
     } finally {
       setIsLoadingData(false)

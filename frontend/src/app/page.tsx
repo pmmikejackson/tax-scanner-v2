@@ -49,20 +49,23 @@ export default function HomePage() {
 
   const geocodeAndLookupTax = async (lat: number, lng: number) => {
     try {
+      console.log(`Geocoding coordinates: ${lat}, ${lng}`)
       // First geocode the coordinates to get address components
       const locationData = await apiClient.geocodeAddress(`${lat},${lng}`)
+      console.log('Geocoding result:', locationData)
       
       if (locationData) {
         // Then lookup tax rates for that location
+        console.log(`Looking up tax rates for: ${locationData.state}, ${locationData.county}, ${locationData.city}`)
         const taxData = await apiClient.getTaxRates(locationData.state, locationData.county, locationData.city)
         setTaxData(taxData)
         setError(null)
       } else {
-        setError('Could not determine location from coordinates.')
+        setError('Could not determine location from coordinates. Please select manually.')
       }
     } catch (err) {
       console.error('Geocoding and tax lookup error:', err)
-      setError('Failed to lookup tax data for your location.')
+      setError('Failed to lookup tax data for your location. Please try manual selection.')
     }
   }
 
