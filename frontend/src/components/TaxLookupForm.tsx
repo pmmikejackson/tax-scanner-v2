@@ -1,102 +1,120 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import apiClient, { LocationOption } from '@/lib/api'
 
 interface TaxLookupFormProps {
   onLookup: (state: string, county: string, city: string) => void
   isLoading: boolean
 }
 
-interface LocationOption {
-  value: string
-  label: string
-}
-
 export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProps) {
   const [selectedState, setSelectedState] = useState('')
   const [selectedCounty, setSelectedCounty] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
+  const [states, setStates] = useState<LocationOption[]>([])
   const [counties, setCounties] = useState<LocationOption[]>([])
   const [cities, setCities] = useState<LocationOption[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Texas-only for now
-  const states: LocationOption[] = [
-    { value: 'TX', label: 'Texas' }
-  ]
-
-  // Sample Texas counties - in production, this would come from your API
-  const texasCounties: LocationOption[] = [
-    { value: 'harris', label: 'Harris County' },
-    { value: 'dallas', label: 'Dallas County' },
-    { value: 'tarrant', label: 'Tarrant County' },
-    { value: 'bexar', label: 'Bexar County' },
-    { value: 'travis', label: 'Travis County' },
-    { value: 'collin', label: 'Collin County' },
-    { value: 'denton', label: 'Denton County' },
-    { value: 'fortbend', label: 'Fort Bend County' },
-    { value: 'montgomery', label: 'Montgomery County' },
-    { value: 'williamson', label: 'Williamson County' },
-  ].sort((a, b) => a.label.localeCompare(b.label))
-
-  // Sample cities by county - in production, this would come from your API
-  const citiesByCounty: Record<string, LocationOption[]> = {
-    harris: [
-      { value: 'houston', label: 'Houston' },
-      { value: 'pasadena', label: 'Pasadena' },
-      { value: 'baytown', label: 'Baytown' },
-      { value: 'pearland', label: 'Pearland' },
-      { value: 'sugarland', label: 'Sugar Land' },
-    ],
-    dallas: [
-      { value: 'dallas', label: 'Dallas' },
-      { value: 'plano', label: 'Plano' },
-      { value: 'garland', label: 'Garland' },
-      { value: 'irving', label: 'Irving' },
-      { value: 'grandprairie', label: 'Grand Prairie' },
-    ],
-    travis: [
-      { value: 'austin', label: 'Austin' },
-      { value: 'roundrock', label: 'Round Rock' },
-      { value: 'pflugerville', label: 'Pflugerville' },
-      { value: 'cedarpark', label: 'Cedar Park' },
-      { value: 'lakeway', label: 'Lakeway' },
-    ],
-    // Add more counties and cities as needed
-  }
-
+  // Load states on component mount
   useEffect(() => {
-    if (selectedState === 'TX') {
-      setCounties(texasCounties)
+    loadStates()
+  }, [])
+
+  // Load counties when state changes
+  useEffect(() => {
+    if (selectedState) {
+      loadCounties(selectedState)
+    } else {
+      setCounties([])
+      setCities([])
       setSelectedCounty('')
       setSelectedCity('')
-      setCities([])
     }
   }, [selectedState])
 
+  // Load cities when county changes
   useEffect(() => {
-    if (selectedCounty && citiesByCounty[selectedCounty]) {
-      const countyCities = citiesByCounty[selectedCounty].sort((a, b) => 
-        a.label.localeCompare(b.label)
-      )
-      setCities(countyCities)
-      setSelectedCity('')
+    if (selectedState && selectedCounty) {
+      loadCities(selectedState, selectedCounty)
     } else {
       setCities([])
       setSelectedCity('')
     }
-  }, [selectedCounty])
+  }, [selectedState, selectedCounty])
+
+  const loadStates = async () => {
+    try {
+      setIsLoadingData(true)
+      setError(null)
+      const statesData = await apiClient.getStates()
+      setStates(statesData)
+    } catch (err) {
+      console.error('Error loading states:', err)
+      setError('Failed to load states. Please refresh the page.')
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
+
+  const loadCounties = async (stateCode: string) => {
+    try {
+      setIsLoadingData(true)
+      setError(null)
+      const countiesData = await apiClient.getCounties(stateCode)
+      setCounties(countiesData)
+      setSelectedCounty('')
+      setSelectedCity('')
+    } catch (err) {
+      console.error('Error loading counties:', err)
+      setError('Failed to load counties. Please try again.')
+      setCounties([])
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
+
+  const loadCities = async (stateCode: string, countyName: string) => {
+    try {
+      setIsLoadingData(true)
+      setError(null)
+      const citiesData = await apiClient.getCities(stateCode, countyName)
+      setCities(citiesData)
+      setSelectedCity('')
+    } catch (err) {
+      console.error('Error loading cities:', err)
+      setError('Failed to load cities. Please try again.')
+      setCities([])
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (selectedState && selectedCounty && selectedCity) {
-      onLookup(selectedState, selectedCounty, selectedCity)
+      // Find the actual names to pass to the API
+      const stateName = states.find(s => s.value === selectedState)?.name || selectedState
+      const countyName = counties.find(c => c.value === selectedCounty)?.name || selectedCounty
+      const cityName = cities.find(c => c.value === selectedCity)?.name || selectedCity
+      
+      onLookup(stateName, countyName, cityName)
     }
   }
 
   const isFormValid = selectedState && selectedCounty && selectedCity
+  const isDisabled = isLoading || isLoadingData
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
       {/* State Selection */}
       <div>
         <label htmlFor="state" className="block text-sm font-medium text-gray-700">
@@ -107,6 +125,7 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
           value={selectedState}
           onChange={(e) => setSelectedState(e.target.value)}
           className="input-field"
+          disabled={isDisabled}
           required
         >
           <option value="">Select a state</option>
@@ -128,10 +147,12 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
           value={selectedCounty}
           onChange={(e) => setSelectedCounty(e.target.value)}
           className="input-field"
-          disabled={!selectedState}
+          disabled={isDisabled || !selectedState}
           required
         >
-          <option value="">Select a county</option>
+          <option value="">
+            {isLoadingData ? 'Loading counties...' : 'Select a county'}
+          </option>
           {counties.map((county) => (
             <option key={county.value} value={county.value}>
               {county.label}
@@ -150,10 +171,12 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
           value={selectedCity}
           onChange={(e) => setSelectedCity(e.target.value)}
           className="input-field"
-          disabled={!selectedCounty}
+          disabled={isDisabled || !selectedCounty}
           required
         >
-          <option value="">Select a city</option>
+          <option value="">
+            {isLoadingData ? 'Loading cities...' : 'Select a city'}
+          </option>
           {cities.map((city) => (
             <option key={city.value} value={city.value}>
               {city.label}
@@ -165,7 +188,7 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={!isFormValid || isLoading}
+        disabled={!isFormValid || isDisabled}
         className="btn-primary w-full"
       >
         {isLoading ? 'Looking up taxes...' : 'Get Tax Rates'}

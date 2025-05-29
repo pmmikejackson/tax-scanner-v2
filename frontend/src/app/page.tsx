@@ -5,17 +5,7 @@ import { MapPinIcon } from '@heroicons/react/24/outline'
 import TaxLookupForm from '@/components/TaxLookupForm'
 import TaxResultsCard from '@/components/TaxResultsCard'
 import DataFreshnessInfo from '@/components/DataFreshnessInfo'
-
-interface TaxData {
-  state: string
-  county: string
-  city: string
-  stateTaxRate: number
-  countyTaxRate: number
-  cityTaxRate: number
-  totalTaxRate: number
-  lastUpdated: string
-}
+import apiClient, { TaxData } from '@/lib/api'
 
 export default function HomePage() {
   const [taxData, setTaxData] = useState<TaxData | null>(null)
@@ -31,6 +21,8 @@ export default function HomePage() {
     }
 
     setIsLoading(true)
+    setError(null)
+    
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -45,8 +37,8 @@ export default function HomePage() {
         lng: position.coords.longitude
       })
       
-      // Reverse geocode to get address and lookup tax
-      await reverseGeocodeAndLookupTax(position.coords.latitude, position.coords.longitude)
+      // Use geocoding to get location info and lookup tax
+      await geocodeAndLookupTax(position.coords.latitude, position.coords.longitude)
     } catch (err) {
       console.error('Geolocation error:', err)
       setError('Unable to get your location. Please select manually.')
@@ -55,17 +47,21 @@ export default function HomePage() {
     }
   }
 
-  const reverseGeocodeAndLookupTax = async (lat: number, lng: number) => {
+  const geocodeAndLookupTax = async (lat: number, lng: number) => {
     try {
-      // This would call your backend API to reverse geocode and get tax data
-      const response = await fetch(`/api/tax/location?lat=${lat}&lng=${lng}`)
-      if (!response.ok) throw new Error('Failed to get tax data')
+      // First geocode the coordinates to get address components
+      const locationData = await apiClient.geocodeAddress(`${lat},${lng}`)
       
-      const data = await response.json()
-      setTaxData(data)
-      setError(null)
+      if (locationData) {
+        // Then lookup tax rates for that location
+        const taxData = await apiClient.getTaxRates(locationData.state, locationData.county, locationData.city)
+        setTaxData(taxData)
+        setError(null)
+      } else {
+        setError('Could not determine location from coordinates.')
+      }
     } catch (err) {
-      console.error('Tax lookup error:', err)
+      console.error('Geocoding and tax lookup error:', err)
       setError('Failed to lookup tax data for your location.')
     }
   }
@@ -75,10 +71,7 @@ export default function HomePage() {
     setError(null)
     
     try {
-      const response = await fetch(`/api/tax/lookup?state=${state}&county=${county}&city=${city}`)
-      if (!response.ok) throw new Error('Failed to get tax data')
-      
-      const data = await response.json()
+      const data = await apiClient.getTaxRates(state, county, city)
       setTaxData(data)
     } catch (err) {
       console.error('Manual lookup error:', err)
@@ -97,7 +90,7 @@ export default function HomePage() {
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           Get accurate sales tax rates for your restaurant by state, county, and city. 
-          Currently supporting Texas with plans to expand nationwide.
+          Currently supporting Texas with official government data from the Texas Comptroller.
         </p>
       </div>
 
@@ -158,13 +151,13 @@ export default function HomePage() {
         <div className="text-blue-800 space-y-3">
           <p>
             Tax Scanner provides up-to-date sales tax information for restaurant owners and managers. 
-            Our data is sourced directly from state comptroller offices to ensure accuracy.
+            Our data is sourced directly from the Texas Comptroller's office to ensure accuracy.
           </p>
           <p>
-            <strong>Currently supporting:</strong> Texas (with county and municipal taxes)
+            <strong>Currently supporting:</strong> Texas with {taxData ? 'thousands of' : 'comprehensive'} locations including county and municipal taxes
           </p>
           <p>
-            <strong>Coming soon:</strong> Additional states with comprehensive tax breakdowns
+            <strong>Data source:</strong> Official Texas Comptroller EDI files, updated quarterly
           </p>
         </div>
       </div>
