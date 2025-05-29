@@ -152,9 +152,15 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
       setIsLoadingData(true)
       setError(null)
       
+      // DEBUG: Log counties array and search parameters
+      console.log('Counties array:', counties)
+      console.log('Looking for county with value:', countyValue)
+      
       // CRITICAL FIX: Convert processed county value back to actual county name
       // Counties dropdown stores processed values like "rockwall" but API needs "Rockwall"
       const county = counties.find(c => c.value === countyValue)
+      console.log('Found county object:', county)
+      
       const actualCountyName = county?.name || countyValue
       
       console.log(`Loading cities for state: ${stateCode}, county: ${actualCountyName} (value: ${countyValue})`)

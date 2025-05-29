@@ -79,19 +79,28 @@ export default function HomePage() {
       alert(`Debug: Geocoding result: ${JSON.stringify(locationData)}`) // Debug (remove when stable)
       
       if (locationData) {
-        // Get tax rates for the detected location
-        console.log(`Looking up tax rates for: ${locationData.state}, ${locationData.county}, ${locationData.city}`)
-        const taxData = await apiClient.getTaxRates(locationData.state, locationData.county, locationData.city)
+        // IMPORTANT: Convert state code to state name for form compatibility
+        // Geocoding returns "TX" but form expects "Texas"
+        let stateName = locationData.state
+        if (locationData.state === 'TX') {
+          stateName = 'Texas'
+        }
+        // Add more state conversions as needed when expanding beyond Texas
+        
+        console.log(`Looking up tax rates for: ${stateName}, ${locationData.county}, ${locationData.city}`)
+        
+        // Get tax rates for the detected location using converted state name
+        const taxData = await apiClient.getTaxRates(stateName, locationData.county, locationData.city)
         
         // Update results and form
         setTaxData(taxData)
         setError(null)
         alert('Debug: Tax lookup successful!') // Debug (remove when stable)
         
-        // IMPORTANT: Set detected location to auto-populate form dropdowns
+        // IMPORTANT: Set detected location with converted state name to auto-populate form dropdowns
         // This triggers the TaxLookupForm to update its selections
         setDetectedLocation({
-          state: locationData.state,
+          state: stateName,           // Use converted name, not code
           county: locationData.county,
           city: locationData.city
         })
