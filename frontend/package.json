@@ -1,13 +1,20 @@
 {
   "name": "tax-scanner-frontend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.js",
+    "build:next": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version",
+    "build:deploy": "npm run version:patch && npm run build",
+    "build:feature": "npm run version:minor && npm run build",
+    "build:major": "npm run version:major && npm run build"
   },
   "dependencies": {
     "next": "14.0.3",
@@ -30,4 +37,4 @@
     "eslint": "^8",
     "eslint-config-next": "14.0.3"
   }
-} 
+}
