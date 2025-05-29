@@ -1,0 +1,21 @@
+{
+  "name": "tax-scanner-docs",
+  "version": "1.0.0",
+  "description": "Documentation generation system for Tax Scanner v2",
+  "main": "generate-guide.js",
+  "scripts": {
+    "generate": "node generate-guide.js",
+    "generate:guide": "node generate-guide.js",
+    "clean": "rm -rf user-guide/output/* user-guide/images/*",
+    "test": "echo \"Documentation system ready\""
+  },
+  "keywords": ["documentation", "pdf", "user-guide", "tax-scanner"],
+  "author": "Tax Scanner Team",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^21.6.1",
+    "markdown-pdf": "^10.0.0",
+    "handlebars": "^4.7.8",
+    "moment": "^2.29.4"
+  }
+}

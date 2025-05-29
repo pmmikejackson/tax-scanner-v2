@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MapPinIcon } from '@heroicons/react/24/outline'
+import { MapPinIcon, BookOpenIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 import TaxLookupForm from '@/components/TaxLookupForm'
 import TaxResultsCard from '@/components/TaxResultsCard'
 import DataFreshnessInfo from '@/components/DataFreshnessInfo'
@@ -143,10 +144,17 @@ export default function HomePage() {
         <h2 className="text-4xl font-bold text-gray-900 mb-4">
           Restaurant Sales Tax Lookup
         </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
           Get accurate sales tax rates for your restaurant by state, county, and city. 
           Currently supporting Texas with official government data from the Texas Comptroller.
         </p>
+        <Link 
+          href="/guide"
+          className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
+        >
+          <BookOpenIcon className="w-5 h-5 mr-2" />
+          View User Guide
+        </Link>
       </div>
 
       {/* Main Content */}
@@ -215,6 +223,15 @@ export default function HomePage() {
           <p>
             <strong>Data source:</strong> Official Texas Comptroller EDI files, updated quarterly
           </p>
+        </div>
+        <div className="mt-6 pt-4 border-t border-blue-200">
+          <Link 
+            href="/guide"
+            className="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium"
+          >
+            <BookOpenIcon className="w-5 h-5 mr-2" />
+            Need help? Check out our user guide
+          </Link>
         </div>
       </div>
     </div>
