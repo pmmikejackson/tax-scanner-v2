@@ -194,6 +194,118 @@ export class TaxService {
     }
   }
 
+  // Geocode address to get location info
+  async geocodeAddress(address: string): Promise<{state: string, county: string, city: string, lat: number, lng: number} | null> {
+    try {
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY
+      if (!apiKey) {
+        logger.warn('Google Maps API key not configured')
+        return null
+      }
+
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+      )
+
+      if (response.data.status !== 'OK' || !response.data.results.length) {
+        return null
+      }
+
+      const result = response.data.results[0]
+      const components = result.address_components
+      const location = result.geometry.location
+
+      let state = ''
+      let county = ''
+      let city = ''
+
+      for (const component of components) {
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.short_name
+        }
+        if (component.types.includes('administrative_area_level_2')) {
+          county = component.long_name.replace(' County', '')
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name
+        }
+      }
+
+      return state && county && city ? { 
+        state, 
+        county, 
+        city, 
+        lat: location.lat, 
+        lng: location.lng 
+      } : null
+    } catch (error) {
+      logger.error('Error geocoding address:', error as Error)
+      return null
+    }
+  }
+
+  // Get all states
+  async getStates(): Promise<Array<{code: string, name: string}>> {
+    try {
+      const states = await prisma.state.findMany({
+        orderBy: { name: 'asc' }
+      })
+      
+      return states.map(state => ({
+        code: state.code,
+        name: state.name
+      }))
+    } catch (error) {
+      logger.error('Error getting states:', error as Error)
+      throw error
+    }
+  }
+
+  // Get counties for a state
+  async getCounties(stateCode: string): Promise<Array<{name: string}>> {
+    try {
+      const counties = await prisma.county.findMany({
+        where: {
+          state: {
+            code: stateCode.toUpperCase()
+          }
+        },
+        orderBy: { name: 'asc' }
+      })
+      
+      return counties.map(county => ({
+        name: county.name
+      }))
+    } catch (error) {
+      logger.error('Error getting counties:', error as Error)
+      throw error
+    }
+  }
+
+  // Get cities for a county in a state
+  async getCities(stateCode: string, countyName: string): Promise<Array<{name: string}>> {
+    try {
+      const cities = await prisma.city.findMany({
+        where: {
+          county: {
+            name: countyName,
+            state: {
+              code: stateCode.toUpperCase()
+            }
+          }
+        },
+        orderBy: { name: 'asc' }
+      })
+      
+      return cities.map(city => ({
+        name: city.name
+      }))
+    } catch (error) {
+      logger.error('Error getting cities:', error as Error)
+      throw error
+    }
+  }
+
   // Seed database with sample Texas data
   async seedDatabase(): Promise<void> {
     try {
@@ -328,4 +440,6 @@ export class TaxService {
       throw error
     }
   }
-} 
+}
+
+export const taxService = new TaxService() 

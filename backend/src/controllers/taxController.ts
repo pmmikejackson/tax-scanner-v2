@@ -1,86 +1,95 @@
 import { Router, Request, Response } from 'express'
-import { TaxService } from '../services/TaxService'
-import { createError } from '../middleware/errorHandler'
+import { taxService } from '../services/TaxService'
+import { taxDataImporter } from '../services/TaxDataImporter'
 import { logger } from '../utils/logger'
 
 const router = Router()
-const taxService = new TaxService()
 
-// Manual tax lookup by state, county, city
+// Get tax rates for a specific location
 router.get('/lookup', async (req: Request, res: Response) => {
   try {
     const { state, county, city } = req.query
-    
+
     if (!state || !county || !city) {
-      throw createError('State, county, and city are required', 400)
+      return res.status(400).json({ error: 'Missing required parameters: state, county, city' })
     }
-    
-    const taxData = await taxService.getTaxRates(
+
+    const taxRates = await taxService.getTaxRates(
       state as string,
       county as string,
       city as string
     )
-    
-    if (!taxData) {
-      throw createError('Tax data not found for the specified location', 404)
+
+    if (!taxRates) {
+      return res.status(404).json({ error: 'Tax rates not found for the specified location' })
     }
-    
-    res.json(taxData)
+
+    res.json(taxRates)
   } catch (error) {
-    logger.error('Error in tax lookup:', error as Error)
-    if (error instanceof Error && 'statusCode' in error) {
-      res.status((error as any).statusCode).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: 'Internal server error' })
-    }
+    logger.error('Error getting tax rates:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 
-// Location-based tax lookup using coordinates
-router.get('/location', async (req: Request, res: Response) => {
+// Get geocoded location data
+router.get('/geocode', async (req: Request, res: Response) => {
   try {
-    const { lat, lng } = req.query
-    
-    if (!lat || !lng) {
-      throw createError('Latitude and longitude are required', 400)
+    const { address } = req.query
+
+    if (!address) {
+      return res.status(400).json({ error: 'Missing required parameter: address' })
     }
-    
-    const taxData = await taxService.getTaxRatesByLocation(
-      parseFloat(lat as string),
-      parseFloat(lng as string)
-    )
-    
-    if (!taxData) {
-      throw createError('Tax data not found for the specified location', 404)
-    }
-    
-    res.json(taxData)
+
+    const location = await taxService.geocodeAddress(address as string)
+    res.json(location)
   } catch (error) {
-    logger.error('Error in location-based tax lookup:', error as Error)
-    if (error instanceof Error && 'statusCode' in error) {
-      res.status((error as any).statusCode).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: 'Internal server error' })
-    }
+    logger.error('Error geocoding address:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 
-// Refresh tax data
-router.post('/refresh', async (req: Request, res: Response) => {
+// Get states list
+router.get('/states', async (req: Request, res: Response) => {
   try {
-    const result = await taxService.refreshTaxData()
-    res.json({
-      message: 'Tax data refresh initiated',
-      lastUpdated: result.lastUpdated,
-      recordsUpdated: result.recordsUpdated
-    })
+    const states = await taxService.getStates()
+    res.json(states)
   } catch (error) {
-    logger.error('Error refreshing tax data:', error as Error)
-    if (error instanceof Error && 'statusCode' in error) {
-      res.status((error as any).statusCode).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: 'Internal server error' })
+    logger.error('Error getting states:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Get counties for a state
+router.get('/counties', async (req: Request, res: Response) => {
+  try {
+    const { state } = req.query
+
+    if (!state) {
+      return res.status(400).json({ error: 'Missing required parameter: state' })
     }
+
+    const counties = await taxService.getCounties(state as string)
+    res.json(counties)
+  } catch (error) {
+    logger.error('Error getting counties:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Get cities for a county
+router.get('/cities', async (req: Request, res: Response) => {
+  try {
+    const { state, county } = req.query
+
+    if (!state || !county) {
+      return res.status(400).json({ error: 'Missing required parameters: state, county' })
+    }
+
+    const cities = await taxService.getCities(state as string, county as string)
+    res.json(cities)
+  } catch (error) {
+    logger.error('Error getting cities:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 
@@ -95,14 +104,18 @@ router.get('/status', async (req: Request, res: Response) => {
   }
 })
 
-// Seed database with sample data
-router.post('/seed', async (req: Request, res: Response) => {
+// Import official Texas Comptroller data
+router.post('/import-official-data', async (req: Request, res: Response) => {
   try {
-    await taxService.seedDatabase()
-    res.json({ message: 'Database seeded successfully' })
+    logger.info('Starting official tax data import...')
+    const results = await taxDataImporter.importOfficialTaxData()
+    res.json({ 
+      message: 'Official tax data imported successfully',
+      results
+    })
   } catch (error) {
-    logger.error('Error seeding database:', error as Error)
-    res.status(500).json({ error: 'Internal server error' })
+    logger.error('Error importing official tax data:', error as Error)
+    res.status(500).json({ error: 'Failed to import official tax data' })
   }
 })
 
