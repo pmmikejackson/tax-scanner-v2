@@ -4,8 +4,7 @@
   "description": "Backend API for Tax Scanner application",
   "main": "dist/index.js",
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "18.x"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
