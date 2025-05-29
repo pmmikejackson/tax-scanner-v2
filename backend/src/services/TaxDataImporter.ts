@@ -145,22 +145,24 @@ export class TaxDataImporter {
         update: {},
         create: {
           name: 'Texas',
-          code: 'TX'
+          code: 'TX',
+          taxRate: TaxDataImporter.STATE_RATE
         }
       })
 
       // Find or create county
       const county = await prisma.county.upsert({
         where: { 
-          name_stateId: {
-            name: entry.county,
-            stateId: state.id
+          stateId_name: {
+            stateId: state.id,
+            name: entry.county
           }
         },
         update: {},
         create: {
           name: entry.county,
-          stateId: state.id
+          stateId: state.id,
+          taxRate: entry.countyRate
         }
       })
 
@@ -172,17 +174,14 @@ export class TaxDataImporter {
         }
       })
 
-      const totalTaxRate = TaxDataImporter.STATE_RATE + entry.cityRate + entry.countyRate + entry.district1Rate + entry.district2Rate
+      const localTaxRate = entry.cityRate + entry.district1Rate + entry.district2Rate
 
       if (existingCity) {
         // Update existing city
         await prisma.city.update({
           where: { id: existingCity.id },
           data: {
-            stateTaxRate: TaxDataImporter.STATE_RATE,
-            localTaxRate: entry.cityRate + entry.countyRate + entry.district1Rate + entry.district2Rate,
-            totalTaxRate: totalTaxRate,
-            lastUpdated: new Date()
+            taxRate: localTaxRate
           }
         })
         return { isNew: false }
@@ -192,10 +191,7 @@ export class TaxDataImporter {
           data: {
             name: entry.city,
             countyId: county.id,
-            stateTaxRate: TaxDataImporter.STATE_RATE,
-            localTaxRate: entry.cityRate + entry.countyRate + entry.district1Rate + entry.district2Rate,
-            totalTaxRate: totalTaxRate,
-            lastUpdated: new Date()
+            taxRate: localTaxRate
           }
         })
         return { isNew: true }
