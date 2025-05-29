@@ -81,13 +81,31 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
       setIsLoadingData(true)
       setError(null)
       console.log(`Loading cities for state: ${stateCode}, county: ${countyName}`)
+      
+      // Add visible debugging
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://tax-scanner-v2-production.up.railway.app'}/api/tax/cities?state=${stateCode}&county=${countyName}`
+      console.log('Cities API URL:', url)
+      
       const citiesData = await apiClient.getCities(stateCode, countyName)
       console.log(`Loaded ${citiesData.length} cities:`, citiesData)
+      
+      // Add temporary alert for debugging
+      if (countyName.toLowerCase().includes('rockwall')) {
+        alert(`Debug: Found ${citiesData.length} cities for ${countyName}`)
+      }
+      
       setCities(citiesData)
       setSelectedCity('')
     } catch (err) {
       console.error('Error loading cities:', err)
-      setError(`Failed to load cities for ${countyName}. Please try again.`)
+      const errorMsg = `Failed to load cities for ${countyName}. Error: ${err instanceof Error ? err.message : 'Unknown error'}`
+      setError(errorMsg)
+      
+      // Add temporary alert for debugging
+      if (countyName.toLowerCase().includes('rockwall')) {
+        alert(`Debug Error: ${errorMsg}`)
+      }
+      
       setCities([])
     } finally {
       setIsLoadingData(false)

@@ -35,13 +35,28 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`)
+    const url = `${this.baseUrl}${endpoint}`
+    console.log('API Request:', url)
     
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+    try {
+      const response = await fetch(url)
+      
+      console.log('API Response status:', response.status)
+      console.log('API Response headers:', response.headers)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API Error Response:', errorText)
+        throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`)
+      }
+      
+      const data = await response.json()
+      console.log('API Response data:', data)
+      return data
+    } catch (error) {
+      console.error('API Request failed:', error)
+      throw error
     }
-    
-    return response.json()
   }
 
   // Get tax rates for a specific location

@@ -23,6 +23,9 @@ export default function HomePage() {
     setIsLoading(true)
     setError(null)
     
+    // Add debugging alert
+    alert('Debug: Starting location detection...')
+    
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -31,6 +34,8 @@ export default function HomePage() {
           maximumAge: 600000 // 10 minutes
         })
       })
+      
+      alert(`Debug: Got coordinates: ${position.coords.latitude}, ${position.coords.longitude}`)
       
       setUserLocation({
         lat: position.coords.latitude,
@@ -41,6 +46,7 @@ export default function HomePage() {
       await geocodeAndLookupTax(position.coords.latitude, position.coords.longitude)
     } catch (err) {
       console.error('Geolocation error:', err)
+      alert(`Debug: Geolocation error: ${err}`)
       setError('Unable to get your location. Please select manually.')
     } finally {
       setIsLoading(false)
@@ -50,9 +56,12 @@ export default function HomePage() {
   const geocodeAndLookupTax = async (lat: number, lng: number) => {
     try {
       console.log(`Geocoding coordinates: ${lat}, ${lng}`)
+      alert(`Debug: Geocoding coordinates: ${lat}, ${lng}`)
+      
       // First geocode the coordinates to get address components
       const locationData = await apiClient.geocodeAddress(`${lat},${lng}`)
       console.log('Geocoding result:', locationData)
+      alert(`Debug: Geocoding result: ${JSON.stringify(locationData)}`)
       
       if (locationData) {
         // Then lookup tax rates for that location
@@ -60,11 +69,14 @@ export default function HomePage() {
         const taxData = await apiClient.getTaxRates(locationData.state, locationData.county, locationData.city)
         setTaxData(taxData)
         setError(null)
+        alert('Debug: Tax lookup successful!')
       } else {
+        alert('Debug: Geocoding returned null')
         setError('Could not determine location from coordinates. Please select manually.')
       }
     } catch (err) {
       console.error('Geocoding and tax lookup error:', err)
+      alert(`Debug: Geocoding error: ${err}`)
       setError('Failed to lookup tax data for your location. Please try manual selection.')
     }
   }
