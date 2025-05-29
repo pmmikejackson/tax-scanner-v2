@@ -95,4 +95,15 @@ router.get('/status', async (req: Request, res: Response) => {
   }
 })
 
+// Seed database with sample data
+router.post('/seed', async (req: Request, res: Response) => {
+  try {
+    await taxService.seedDatabase()
+    res.json({ message: 'Database seeded successfully' })
+  } catch (error) {
+    logger.error('Error seeding database:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 export default router 
