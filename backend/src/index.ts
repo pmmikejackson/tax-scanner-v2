@@ -29,6 +29,7 @@ app.use(cors({
     'https://taxscanner-j7r3o67qc-pmmikejacksons-projects.vercel.app',
     'https://taxscanner-rl24lhgop-pmmikejacksons-projects.vercel.app',
     'https://taxscanner-ep5jp3xcv-pmmikejacksons-projects.vercel.app',
+    'https://taxscanner-fy5ljj3ka-pmmikejacksons-projects.vercel.app',
     ...(process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : [])
   ],
   credentials: true
