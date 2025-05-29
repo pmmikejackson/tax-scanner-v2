@@ -8,13 +8,19 @@ import DataFreshnessInfo from '@/components/DataFreshnessInfo'
 import apiClient, { TaxData } from '@/lib/api'
 
 export default function HomePage() {
-  const [taxData, setTaxData] = useState<TaxData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
+  // COMPONENT STATE
+  const [taxData, setTaxData] = useState<TaxData | null>(null) // Tax rates result
+  const [isLoading, setIsLoading] = useState(false) // Loading state for API calls
+  const [error, setError] = useState<string | null>(null) // Error messages for user
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null) // GPS coordinates
+  // Location detected from GPS + geocoding - passed to form to auto-populate dropdowns
   const [detectedLocation, setDetectedLocation] = useState<{state: string, county: string, city: string} | undefined>(undefined)
 
-  // Get user's location
+  // LOCATION DETECTION FLOW
+  /**
+   * Initiates GPS location detection and subsequent geocoding
+   * Flow: GPS coordinates → Geocoding API → Location names → Tax lookup
+   */
   const detectLocation = async () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by this browser.')
@@ -24,18 +30,20 @@ export default function HomePage() {
     setIsLoading(true)
     setError(null)
     
-    // Add debugging alert
+    // Debug alert for troubleshooting (remove when stable)
     alert('Debug: Starting location detection...')
     
     try {
+      // Get GPS coordinates from browser
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 600000 // 10 minutes
+          maximumAge: 600000 // Cache for 10 minutes
         })
       })
       
+      // Debug logging (remove when stable)
       alert(`Debug: Got coordinates: ${position.coords.latitude}, ${position.coords.longitude}`)
       
       setUserLocation({
@@ -43,7 +51,7 @@ export default function HomePage() {
         lng: position.coords.longitude
       })
       
-      // Use geocoding to get location info and lookup tax
+      // Convert coordinates to location names and lookup tax
       await geocodeAndLookupTax(position.coords.latitude, position.coords.longitude)
     } catch (err) {
       console.error('Geolocation error:', err)
@@ -54,39 +62,56 @@ export default function HomePage() {
     }
   }
 
+  /**
+   * Converts GPS coordinates to location names and gets tax rates
+   * @param lat - Latitude from GPS
+   * @param lng - Longitude from GPS
+   * Flow: Coordinates → Google Maps Geocoding → Location names → Tax rates → Update form
+   */
   const geocodeAndLookupTax = async (lat: number, lng: number) => {
     try {
       console.log(`Geocoding coordinates: ${lat}, ${lng}`)
-      alert(`Debug: Geocoding coordinates: ${lat}, ${lng}`)
+      alert(`Debug: Geocoding coordinates: ${lat}, ${lng}`) // Debug (remove when stable)
       
-      // First geocode the coordinates to get address components
+      // Use Google Maps Geocoding API to convert coordinates to location names
       const locationData = await apiClient.geocodeAddress(`${lat},${lng}`)
       console.log('Geocoding result:', locationData)
-      alert(`Debug: Geocoding result: ${JSON.stringify(locationData)}`)
+      alert(`Debug: Geocoding result: ${JSON.stringify(locationData)}`) // Debug (remove when stable)
       
       if (locationData) {
-        // Then lookup tax rates for that location
+        // Get tax rates for the detected location
         console.log(`Looking up tax rates for: ${locationData.state}, ${locationData.county}, ${locationData.city}`)
         const taxData = await apiClient.getTaxRates(locationData.state, locationData.county, locationData.city)
+        
+        // Update results and form
         setTaxData(taxData)
         setError(null)
-        alert('Debug: Tax lookup successful!')
+        alert('Debug: Tax lookup successful!') // Debug (remove when stable)
+        
+        // IMPORTANT: Set detected location to auto-populate form dropdowns
+        // This triggers the TaxLookupForm to update its selections
         setDetectedLocation({
           state: locationData.state,
           county: locationData.county,
           city: locationData.city
         })
       } else {
-        alert('Debug: Geocoding returned null')
+        alert('Debug: Geocoding returned null') // Debug (remove when stable)
         setError('Could not determine location from coordinates. Please select manually.')
       }
     } catch (err) {
       console.error('Geocoding and tax lookup error:', err)
-      alert(`Debug: Geocoding error: ${err}`)
+      alert(`Debug: Geocoding error: ${err}`) // Debug (remove when stable)
       setError('Failed to lookup tax data for your location. Please try manual selection.')
     }
   }
 
+  /**
+   * Handles manual tax rate lookup from form submission
+   * @param state - State name (e.g., "Texas")
+   * @param county - County name (e.g., "Rockwall")
+   * @param city - City name (e.g., "Rockwall")
+   */
   const handleManualLookup = async (state: string, county: string, city: string) => {
     setIsLoading(true)
     setError(null)

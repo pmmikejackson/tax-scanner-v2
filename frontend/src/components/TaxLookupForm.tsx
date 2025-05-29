@@ -6,6 +6,8 @@ import apiClient, { LocationOption } from '@/lib/api'
 interface TaxLookupFormProps {
   onLookup: (state: string, county: string, city: string) => void
   isLoading: boolean
+  // Optional location data from parent component (used when location detection succeeds)
+  // This allows the form to auto-populate dropdowns with detected location
   selectedLocation?: {
     state: string
     county: string
@@ -14,12 +16,17 @@ interface TaxLookupFormProps {
 }
 
 export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }: TaxLookupFormProps) {
+  // Form state - stores the selected values for dropdowns
   const [selectedState, setSelectedState] = useState('')
   const [selectedCounty, setSelectedCounty] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
+  
+  // Data arrays populated from API calls
   const [states, setStates] = useState<LocationOption[]>([])
   const [counties, setCounties] = useState<LocationOption[]>([])
   const [cities, setCities] = useState<LocationOption[]>([])
+  
+  // Loading and error state for API calls
   const [isLoadingData, setIsLoadingData] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,10 +35,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     loadStates()
   }, [])
 
-  // Update form when location is detected from parent
+  // LOCATION DETECTION INTEGRATION
+  // When parent component detects user location via GPS/geocoding,
+  // automatically update form selections to match detected location
   useEffect(() => {
     if (selectedLocation) {
-      // Find state by name and set it
+      // Find state by name and set it (triggers county loading via next effect)
       const state = states.find(s => s.name === selectedLocation.state)
       if (state) {
         setSelectedState(state.value)
@@ -41,6 +50,7 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
   }, [selectedLocation, states])
 
   // Auto-select county when it becomes available after location detection
+  // This runs after counties are loaded and we have a selectedLocation
   useEffect(() => {
     if (selectedLocation && counties.length > 0 && !selectedCounty) {
       const county = counties.find(c => c.name === selectedLocation.county)
@@ -51,6 +61,7 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
   }, [selectedLocation, counties, selectedCounty])
 
   // Auto-select city when it becomes available after location detection
+  // This runs after cities are loaded and we have a selectedLocation
   useEffect(() => {
     if (selectedLocation && cities.length > 0 && !selectedCity) {
       const city = cities.find(c => c.name === selectedLocation.city)
@@ -60,11 +71,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }, [selectedLocation, cities, selectedCity])
 
-  // Load counties when state changes
+  // Load counties when state changes (both manual selection and auto-selection)
   useEffect(() => {
     if (selectedState) {
       loadCounties(selectedState)
     } else {
+      // Clear dependent dropdowns when no state selected
       setCounties([])
       setCities([])
       setSelectedCounty('')
@@ -72,16 +84,23 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }, [selectedState])
 
-  // Load cities when county changes
+  // Load cities when county changes (both manual selection and auto-selection)
   useEffect(() => {
     if (selectedState && selectedCounty) {
       loadCities(selectedState, selectedCounty)
     } else {
+      // Clear cities when no county selected
       setCities([])
       setSelectedCity('')
     }
   }, [selectedState, selectedCounty])
 
+  // API FUNCTIONS - Load data from backend
+  
+  /**
+   * Loads all available states from the backend API
+   * Called once on component mount
+   */
   const loadStates = async () => {
     try {
       setIsLoadingData(true)
@@ -96,12 +115,18 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }
 
+  /**
+   * Loads counties for a specific state
+   * @param stateCode - State code (e.g., "TX")
+   * Clears existing county/city selections when called
+   */
   const loadCounties = async (stateCode: string) => {
     try {
       setIsLoadingData(true)
       setError(null)
       const countiesData = await apiClient.getCounties(stateCode)
       setCounties(countiesData)
+      // Clear dependent selections when counties reload
       setSelectedCounty('')
       setSelectedCity('')
     } catch (err) {
@@ -113,37 +138,48 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }
 
+  /**
+   * Loads cities for a specific county within a state
+   * @param stateCode - State code (e.g., "TX")
+   * @param countyValue - Processed county value from dropdown (e.g., "rockwall")
+   * 
+   * IMPORTANT: This function resolves the actual county name from the counties array
+   * because the API expects the real county name (e.g., "Rockwall") but the dropdown
+   * stores a processed value (e.g., "rockwall" - lowercase, no spaces)
+   */
   const loadCities = async (stateCode: string, countyValue: string) => {
     try {
       setIsLoadingData(true)
       setError(null)
       
-      // Find the actual county name from the counties array
+      // CRITICAL FIX: Convert processed county value back to actual county name
+      // Counties dropdown stores processed values like "rockwall" but API needs "Rockwall"
       const county = counties.find(c => c.value === countyValue)
       const actualCountyName = county?.name || countyValue
       
       console.log(`Loading cities for state: ${stateCode}, county: ${actualCountyName} (value: ${countyValue})`)
       
-      // Add visible debugging
+      // Debug logging for troubleshooting
       const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://tax-scanner-v2-production.up.railway.app'}/api/tax/cities?state=${stateCode}&county=${actualCountyName}`
       console.log('Cities API URL:', url)
       
+      // Call API with actual county name, not processed value
       const citiesData = await apiClient.getCities(stateCode, actualCountyName)
       console.log(`Loaded ${citiesData.length} cities:`, citiesData)
       
-      // Add temporary alert for debugging
+      // Temporary debug alert for Rockwall testing (remove when stable)
       if (actualCountyName.toLowerCase().includes('rockwall')) {
         alert(`Debug: Found ${citiesData.length} cities for ${actualCountyName}`)
       }
       
       setCities(citiesData)
-      setSelectedCity('')
+      setSelectedCity('') // Clear city selection when cities reload
     } catch (err) {
       console.error('Error loading cities:', err)
       const errorMsg = `Failed to load cities for ${countyValue}. Error: ${err instanceof Error ? err.message : 'Unknown error'}`
       setError(errorMsg)
       
-      // Add temporary alert for debugging
+      // Temporary debug alert for Rockwall testing (remove when stable)
       if (countyValue.toLowerCase().includes('rockwall')) {
         alert(`Debug Error: ${errorMsg}`)
       }
@@ -154,10 +190,15 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }
 
+  /**
+   * Handles form submission for manual tax rate lookup
+   * Converts dropdown values back to actual names before calling parent's onLookup
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (selectedState && selectedCounty && selectedCity) {
-      // Find the actual names to pass to the API
+      // Convert stored values back to actual names for API call
+      // Dropdowns store processed values but API expects real names
       const stateName = states.find(s => s.value === selectedState)?.name || selectedState
       const countyName = counties.find(c => c.value === selectedCounty)?.name || selectedCounty
       const cityName = cities.find(c => c.value === selectedCity)?.name || selectedCity
@@ -166,18 +207,20 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     }
   }
 
+  // Form validation and state
   const isFormValid = selectedState && selectedCounty && selectedCity
   const isDisabled = isLoading || isLoadingData
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Error display */}
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
-      {/* State Selection */}
+      {/* State Selection Dropdown */}
       <div>
         <label htmlFor="state" className="block text-sm font-medium text-gray-700">
           State
@@ -199,7 +242,7 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
         </select>
       </div>
 
-      {/* County Selection */}
+      {/* County Selection Dropdown */}
       <div>
         <label htmlFor="county" className="block text-sm font-medium text-gray-700">
           County
@@ -223,7 +266,7 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
         </select>
       </div>
 
-      {/* City Selection */}
+      {/* City Selection Dropdown */}
       <div>
         <label htmlFor="city" className="block text-sm font-medium text-gray-700">
           City
