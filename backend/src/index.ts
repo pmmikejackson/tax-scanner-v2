@@ -24,7 +24,12 @@ const limiter = rateLimit({
 // Middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'https://taxscanner-j7r3o67qc-pmmikejacksons-projects.vercel.app',
+    'https://taxscanner-rl24lhgop-pmmikejacksons-projects.vercel.app',
+    ...(process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : [])
+  ],
   credentials: true
 }))
 app.use(limiter)
