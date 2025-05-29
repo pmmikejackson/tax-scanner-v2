@@ -199,8 +199,8 @@ export class TaxService {
     try {
       const apiKey = process.env.GOOGLE_MAPS_API_KEY
       if (!apiKey) {
-        logger.warn('Google Maps API key not configured')
-        return null
+        logger.warn('Google Maps API key not configured for geocoding')
+        throw new Error('Geocoding service not available - API key not configured')
       }
 
       const response = await axios.get(
@@ -208,6 +208,7 @@ export class TaxService {
       )
 
       if (response.data.status !== 'OK' || !response.data.results.length) {
+        logger.warn(`Geocoding failed for address: ${address}, status: ${response.data.status}`)
         return null
       }
 
@@ -231,16 +232,21 @@ export class TaxService {
         }
       }
 
-      return state && county && city ? { 
+      if (!state || !county || !city) {
+        logger.warn(`Incomplete location data for address: ${address}, state: ${state}, county: ${county}, city: ${city}`)
+        return null
+      }
+
+      return { 
         state, 
         county, 
         city, 
         lat: location.lat, 
         lng: location.lng 
-      } : null
+      }
     } catch (error) {
       logger.error('Error geocoding address:', error as Error)
-      return null
+      throw error
     }
   }
 

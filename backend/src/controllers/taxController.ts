@@ -119,4 +119,21 @@ router.post('/import-official-data', async (req: Request, res: Response) => {
   }
 })
 
+// Debug endpoint to check API key status
+router.get('/debug', async (req: Request, res: Response) => {
+  try {
+    const hasGoogleMapsKey = !!process.env.GOOGLE_MAPS_API_KEY
+    const corsOrigin = process.env.CORS_ORIGIN
+    
+    res.json({
+      googleMapsApiKey: hasGoogleMapsKey ? 'configured' : 'missing',
+      corsOrigin: corsOrigin || 'not set',
+      environment: process.env.NODE_ENV || 'development'
+    })
+  } catch (error) {
+    logger.error('Error in debug endpoint:', error as Error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 export default router 
