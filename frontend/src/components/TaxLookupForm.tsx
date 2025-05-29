@@ -165,10 +165,6 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
       
       console.log(`Loading cities for state: ${stateCode}, county: ${actualCountyName} (value: ${countyValue})`)
       
-      // Debug logging for troubleshooting
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://tax-scanner-v2-production.up.railway.app'}/api/tax/cities?state=${stateCode}&county=${actualCountyName}`
-      console.log('Cities API URL:', url)
-      
       // Call API with actual county name, not processed value
       const citiesData = await apiClient.getCities(stateCode, actualCountyName)
       console.log(`Loaded ${citiesData.length} cities:`, citiesData)
