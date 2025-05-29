@@ -6,9 +6,14 @@ import apiClient, { LocationOption } from '@/lib/api'
 interface TaxLookupFormProps {
   onLookup: (state: string, county: string, city: string) => void
   isLoading: boolean
+  selectedLocation?: {
+    state: string
+    county: string
+    city: string
+  }
 }
 
-export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProps) {
+export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }: TaxLookupFormProps) {
   const [selectedState, setSelectedState] = useState('')
   const [selectedCounty, setSelectedCounty] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
@@ -22,6 +27,38 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
   useEffect(() => {
     loadStates()
   }, [])
+
+  // Update form when location is detected from parent
+  useEffect(() => {
+    if (selectedLocation) {
+      // Find state by name and set it
+      const state = states.find(s => s.name === selectedLocation.state)
+      if (state) {
+        setSelectedState(state.value)
+        // Note: counties and cities will load automatically via other effects
+      }
+    }
+  }, [selectedLocation, states])
+
+  // Auto-select county when it becomes available after location detection
+  useEffect(() => {
+    if (selectedLocation && counties.length > 0 && !selectedCounty) {
+      const county = counties.find(c => c.name === selectedLocation.county)
+      if (county) {
+        setSelectedCounty(county.value)
+      }
+    }
+  }, [selectedLocation, counties, selectedCounty])
+
+  // Auto-select city when it becomes available after location detection
+  useEffect(() => {
+    if (selectedLocation && cities.length > 0 && !selectedCity) {
+      const city = cities.find(c => c.name === selectedLocation.city)
+      if (city) {
+        setSelectedCity(city.value)
+      }
+    }
+  }, [selectedLocation, cities, selectedCity])
 
   // Load counties when state changes
   useEffect(() => {
@@ -76,33 +113,38 @@ export default function TaxLookupForm({ onLookup, isLoading }: TaxLookupFormProp
     }
   }
 
-  const loadCities = async (stateCode: string, countyName: string) => {
+  const loadCities = async (stateCode: string, countyValue: string) => {
     try {
       setIsLoadingData(true)
       setError(null)
-      console.log(`Loading cities for state: ${stateCode}, county: ${countyName}`)
+      
+      // Find the actual county name from the counties array
+      const county = counties.find(c => c.value === countyValue)
+      const actualCountyName = county?.name || countyValue
+      
+      console.log(`Loading cities for state: ${stateCode}, county: ${actualCountyName} (value: ${countyValue})`)
       
       // Add visible debugging
-      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://tax-scanner-v2-production.up.railway.app'}/api/tax/cities?state=${stateCode}&county=${countyName}`
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://tax-scanner-v2-production.up.railway.app'}/api/tax/cities?state=${stateCode}&county=${actualCountyName}`
       console.log('Cities API URL:', url)
       
-      const citiesData = await apiClient.getCities(stateCode, countyName)
+      const citiesData = await apiClient.getCities(stateCode, actualCountyName)
       console.log(`Loaded ${citiesData.length} cities:`, citiesData)
       
       // Add temporary alert for debugging
-      if (countyName.toLowerCase().includes('rockwall')) {
-        alert(`Debug: Found ${citiesData.length} cities for ${countyName}`)
+      if (actualCountyName.toLowerCase().includes('rockwall')) {
+        alert(`Debug: Found ${citiesData.length} cities for ${actualCountyName}`)
       }
       
       setCities(citiesData)
       setSelectedCity('')
     } catch (err) {
       console.error('Error loading cities:', err)
-      const errorMsg = `Failed to load cities for ${countyName}. Error: ${err instanceof Error ? err.message : 'Unknown error'}`
+      const errorMsg = `Failed to load cities for ${countyValue}. Error: ${err instanceof Error ? err.message : 'Unknown error'}`
       setError(errorMsg)
       
       // Add temporary alert for debugging
-      if (countyName.toLowerCase().includes('rockwall')) {
+      if (countyValue.toLowerCase().includes('rockwall')) {
         alert(`Debug Error: ${errorMsg}`)
       }
       

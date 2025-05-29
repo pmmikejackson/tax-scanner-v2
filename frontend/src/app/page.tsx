@@ -12,6 +12,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
+  const [detectedLocation, setDetectedLocation] = useState<{state: string, county: string, city: string} | undefined>(undefined)
 
   // Get user's location
   const detectLocation = async () => {
@@ -70,6 +71,11 @@ export default function HomePage() {
         setTaxData(taxData)
         setError(null)
         alert('Debug: Tax lookup successful!')
+        setDetectedLocation({
+          state: locationData.state,
+          county: locationData.county,
+          city: locationData.city
+        })
       } else {
         alert('Debug: Geocoding returned null')
         setError('Could not determine location from coordinates. Please select manually.')
@@ -138,6 +144,7 @@ export default function HomePage() {
             <TaxLookupForm 
               onLookup={handleManualLookup}
               isLoading={isLoading}
+              selectedLocation={detectedLocation}
             />
 
             {error && (
