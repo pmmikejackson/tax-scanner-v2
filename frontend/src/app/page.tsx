@@ -14,6 +14,8 @@ export default function HomePage() {
   const [supportedStates, setSupportedStates] = useState<SupportedState[]>([])
   const [selectedState, setSelectedState] = useState<{ code: string; name: string } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLocating, setIsLocating] = useState(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchSupportedStates() {
@@ -45,6 +47,78 @@ export default function HomePage() {
     setSelectedState(null)
   }
 
+  /**
+   * Use My Location functionality
+   * Gets user's GPS coordinates and automatically navigates to tax lookup
+   */
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by this browser.')
+      return
+    }
+
+    setIsLocating(true)
+    setLocationError(null)
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords
+          console.log('📍 Location detected:', latitude, longitude)
+          
+          // Geocode the coordinates to get state information
+          const locationData = await apiClient.geocodeAddress(`${latitude},${longitude}`)
+          console.log('📍 Geocoded location:', locationData)
+          
+          // Find matching supported state
+          const matchingState = supportedStates.find(state => 
+            state.name.toLowerCase() === locationData.state.toLowerCase() ||
+            state.code.toLowerCase() === locationData.state.toLowerCase()
+          )
+          
+          if (matchingState) {
+            console.log('📍 Found supported state:', matchingState)
+            handleStateSelect(matchingState.code, matchingState.name)
+          } else {
+            setLocationError(`Sorry, ${locationData.state} is not supported yet. Please select a state manually.`)
+          }
+        } catch (error) {
+          console.error('Geocoding failed:', error)
+          setLocationError('Unable to determine your location. Please select a state manually.')
+        } finally {
+          setIsLocating(false)
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error)
+        let errorMessage = 'Unable to get your location. '
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Please allow location access and try again.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information is unavailable.'
+            break
+          case error.TIMEOUT:
+            errorMessage += 'Location request timed out.'
+            break
+          default:
+            errorMessage += 'An unknown error occurred.'
+            break
+        }
+        
+        setLocationError(errorMessage)
+        setIsLocating(false)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    )
+  }
+
   if (selectedState) {
     return (
       <StateDetailView
@@ -66,9 +140,40 @@ export default function HomePage() {
           <p className="text-xl text-gray-600 mb-2">
             Find sales tax rates for restaurants across America
           </p>
-          <p className="text-lg text-gray-500">
+          <p className="text-lg text-gray-500 mb-6">
             Click on a supported state to get started
           </p>
+          
+          {/* Use My Location Button */}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <button
+              onClick={handleUseMyLocation}
+              disabled={isLocating}
+              className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
+              aria-label="Use my current location to find tax rates"
+            >
+              {isLocating ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Getting Location...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>Use My Location</span>
+                </>
+              )}
+            </button>
+            
+            {locationError && (
+              <div className="max-w-md px-4 py-2 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
+                {locationError}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Interactive Map */}

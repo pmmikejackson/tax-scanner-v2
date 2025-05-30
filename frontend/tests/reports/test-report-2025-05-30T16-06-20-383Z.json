@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-05-30T16:06:20.381Z",
+  "summary": {
+    "totalIssues": 19,
+    "criticalIssues": 8,
+    "warnings": 11,
+    "buildSuccess": false,
+    "apiConnected": true
+  },
+  "issues": {
+    "critical": [
+      "❌ node_modules directory missing - run npm install",
+      "❌ \"Use My Location\" button missing from main page",
+      "❌ Geolocation functionality missing from TaxLookupForm",
+      "❌ node_modules directory missing - run npm install",
+      "❌ TaxLookupForm.tsx uses React but missing import",
+      "❌ Build failed with non-zero exit code",
+      "❌ No environment files found (.env.local, .env.development, .env.production)",
+      "❌ NEXT_PUBLIC_API_URL environment variable not set"
+    ],
+    "warnings": [
+      "⚠️ Root package-lock.json may cause dependency conflicts",
+      "⚠️ VersionInfo.tsx may have TypeScript issues (any types)",
+      "⚠️ .env.example missing for documentation",
+      "⚠️ .env.local missing - API calls may fail",
+      "⚠️ Next.js optimization config missing",
+      "⚠️ DataFreshnessInfo.tsx buttons missing aria-label",
+      "⚠️ DataFreshnessInfo.tsx missing keyboard navigation support",
+      "⚠️ StateDetailView.tsx buttons missing aria-label",
+      "⚠️ StateDetailView.tsx missing keyboard navigation support",
+      "⚠️ TaxLookupForm.tsx buttons missing aria-label",
+      "⚠️ USStatesMap.tsx missing keyboard navigation support"
+    ]
+  },
+  "recommendations": [
+    "🚨 URGENT: Fix build errors to enable deployment",
+    "💡 Run: npm install to resolve dependency issues"
+  ]
+}
