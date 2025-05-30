@@ -5,6 +5,78 @@ All notable changes to Tax Scanner v2 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-05-30
+
+### 🎉 Major Features Added
+- **Interactive Grid-Based US Map**: Completely redesigned the state selection interface
+  - Replaced geometric shapes with a proper grid layout that resembles the US geographical layout
+  - All 50 states now displayed in an intuitive grid format
+  - Alaska and Hawaii positioned separately below the main grid
+
+### ✨ Enhancements
+- **Visual State Indicators**: 
+  - Supported states highlighted in emerald green
+  - Unsupported states shown in gray with "Coming Soon" indication
+  - Hover effects with smooth transitions and scaling
+  - Interactive tooltips showing state names and status
+
+### 🐛 Bug Fixes
+- **Loading State Issue**: Fixed infinite loading spinner that prevented map from rendering
+  - Added proper `setIsLoading(false)` in the API fetch completion handler
+  - Map now loads immediately after state data is fetched
+
+### 🔧 Technical Improvements
+- **Code Documentation**: Added comprehensive JSDoc comments throughout USStatesMap component
+- **Performance**: Optimized rendering with proper React key props and efficient state management
+- **Accessibility**: Enhanced with proper ARIA labels and keyboard navigation support
+
+### 📊 State Coverage
+- Currently supporting: **Illinois (IL)**, **Texas (TX)**
+- Coming soon: 48 additional states
+- Visual legend displaying current coverage statistics
+
+---
+
+## [0.2.0] - 2025-05-28
+
+### Added
+- Backend API integration with Railway deployment
+- CORS configuration for frontend-backend communication
+- Texas state tax rate lookup functionality
+- Illinois state tax rate support
+
+### Fixed
+- Production build optimization issues
+- TypeScript compilation errors
+- Vercel deployment configuration
+
+---
+
+## [0.1.0] - 2025-05-25
+
+### Added
+- Initial Next.js frontend application
+- Express.js backend with Prisma ORM
+- Basic tax rate lookup functionality
+- Vercel and Railway deployment setup
+- User authentication and state management
+
+---
+
+## Development Guidelines
+
+### Version Numbering
+- **Major (X.0.0)**: Breaking changes, major feature overhauls
+- **Minor (0.X.0)**: New features, significant improvements
+- **Patch (0.0.X)**: Bug fixes, minor improvements
+
+### Deployment Process
+1. Update version in `package.json`
+2. Update this `CHANGELOG.md`
+3. Commit changes to GitHub
+4. Deploy to production
+5. Update user documentation
+
 ## [Unreleased] - 2025-05-30
 
 ### 🎯 Today's Roadmap
