@@ -220,3 +220,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **v0.1.2**: Google Maps API fixes
 - **v0.1.1**: Initial CORS fixes
 - **v0.1.0**: Initial production release 
+
+## [0.1.22] - 2025-05-30 ✅ DEPLOYED - 🎉 **ILLINOIS INTEGRATION**
+
+### 🚀 **MAJOR MILESTONE: ILLINOIS STATE SUPPORT**
+
+**🌟 NEW STATE ADDED:** Illinois with sophisticated dual-rate tax system!
+
+**✨ Illinois Features:**
+- **Dual-Rate System**: 6.25% general merchandise vs 1% restaurant food/medicine
+- **Restaurant Savings**: 5.25% lower taxes on food compared to general items
+- **Professional Display**: Enhanced UI showing both rates with clear breakdown
+- **Major Cities**: Chicago, Naperville, Joliet (with more to come)
+- **Official Data Source**: Ready for Illinois Department of Revenue machine-readable files
+
+**🔧 Technical Implementation:**
+- **Backend**: Extended database schema with `foodTaxRate` fields for all levels
+- **API**: New dual-rate responses with backward compatibility for Texas
+- **Frontend**: Enhanced TaxResultsCard with dual-rate display and savings calculation
+- **Data**: Illinois seed data with Cook County, DuPage County, Will County
+
+**📊 Example Illinois Results:**
+- **Chicago General**: 6.25% state + 1.75% county + 1.25% city = **9.25% total**
+- **Chicago Food**: 1% state + 1.75% county + 1.25% city = **4% total** 
+- **Savings**: Restaurant food is **5.25% lower** than general merchandise!
+
+**🎯 Impact:**
+- **Restaurant owners** can now see significant tax savings on food vs merchandise
+- **Dual-state coverage**: Texas (single-rate) + Illinois (dual-rate)
+- **Scalable architecture**: Ready for more states with any tax structure
+
+### Technical Details
+- **Database**: Added migration for `foodTaxRate` columns
+- **API Routes**: `/api/tax/seed-illinois`, `/api/tax/import-illinois-data`
+- **Location Detection**: Enhanced state conversion (IL ↔ Illinois)
+- **Error Handling**: Graceful fallback for missing food rates
+
+### Status
+- ✅ **API**: Illinois endpoints working
+- ✅ **Database**: Illinois cities seeded successfully
+- ✅ **Frontend**: Dual-rate display functional
+- ✅ **Testing**: Chicago tax lookup verified (9.25% general, 4% food)
+
+--- 
