@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { taxService } from '../services/TaxService'
 import { taxDataImporter } from '../services/TaxDataImporter'
+import { illinoisTaxDataImporter } from '../services/IllinoisTaxDataImporter'
 import { logger } from '../utils/logger'
 
 const router = Router()
@@ -116,6 +117,37 @@ router.post('/import-official-data', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('Error importing official tax data:', error as Error)
     res.status(500).json({ error: 'Failed to import official tax data' })
+  }
+})
+
+// Import official Illinois Department of Revenue data
+router.post('/import-illinois-data', async (req: Request, res: Response) => {
+  try {
+    logger.info('Starting Illinois Department of Revenue data import...')
+    const results = await illinoisTaxDataImporter.importOfficialTaxData()
+    res.json({ 
+      message: 'Illinois tax data imported successfully',
+      results,
+      note: 'Illinois dual-rate system: General merchandise vs Restaurant food/medicine rates'
+    })
+  } catch (error) {
+    logger.error('Error importing Illinois tax data:', error as Error)
+    res.status(500).json({ error: 'Failed to import Illinois tax data' })
+  }
+})
+
+// Seed Illinois database with major cities
+router.post('/seed-illinois', async (req: Request, res: Response) => {
+  try {
+    logger.info('Starting Illinois database seeding...')
+    await illinoisTaxDataImporter.seedIllinoisData()
+    res.json({ 
+      message: 'Illinois database seeded successfully',
+      note: 'Added major Illinois cities: Chicago, Naperville, Joliet with dual-rate support'
+    })
+  } catch (error) {
+    logger.error('Error seeding Illinois database:', error as Error)
+    res.status(500).json({ error: 'Failed to seed Illinois database' })
   }
 })
 

@@ -80,8 +80,10 @@ export default function HomePage() {
         let stateName = locationData.state
         if (locationData.state === 'TX') {
           stateName = 'Texas'
+        } else if (locationData.state === 'IL') {
+          stateName = 'Illinois'
         }
-        // Add more state conversions as needed when expanding beyond Texas
+        // Add more state conversions as needed when expanding beyond Texas and Illinois
         
         console.log(`Looking up tax rates for: ${stateCode}, ${locationData.county}, ${locationData.city}`)
         
@@ -144,8 +146,10 @@ export default function HomePage() {
       let stateCode = state
       if (state === 'Texas') {
         stateCode = 'TX'
+      } else if (state === 'Illinois') {
+        stateCode = 'IL'
       }
-      // Add more state conversions as needed when expanding beyond Texas
+      // Add more state conversions as needed when expanding beyond Texas and Illinois
       
       console.log(`Manual lookup: Converting "${state}" to "${stateCode}" for API call`)
       

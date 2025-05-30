@@ -12,7 +12,16 @@ export interface TaxData {
   countyTaxRate: number
   cityTaxRate: number
   totalTaxRate: number
+  // Illinois dual-rate support
+  stateFoodTaxRate?: number
+  countyFoodTaxRate?: number
+  cityFoodTaxRate?: number
+  totalFoodTaxRate?: number
   lastUpdated: string
+  // Additional metadata
+  stateCode: string
+  hasDualRates: boolean // True if state supports different rates for food vs general items
+  rateType: 'single' | 'dual' // 'single' for states like Texas, 'dual' for Illinois
 }
 
 export interface DataStatus {
@@ -58,16 +67,50 @@ export class TaxService {
       const countyRecord = stateRecord.counties[0]
       const cityRecord = countyRecord.cities[0]
 
-      return {
+      // Determine if this state has dual rates (Illinois has different rates for food vs general)
+      const hasDualRates = stateRecord.foodTaxRate !== null && 
+                          stateRecord.foodTaxRate !== stateRecord.taxRate
+      
+      const rateType = hasDualRates ? 'dual' : 'single'
+
+      // Calculate general merchandise rates
+      const stateTaxRate = stateRecord.taxRate
+      const countyTaxRate = countyRecord.taxRate
+      const cityTaxRate = cityRecord.taxRate
+      const totalTaxRate = stateTaxRate + countyTaxRate + cityTaxRate
+
+      // Base response for all states
+      const baseResponse: TaxData = {
         state: stateRecord.name,
         county: countyRecord.name,
         city: cityRecord.name,
-        stateTaxRate: stateRecord.taxRate,
-        countyTaxRate: countyRecord.taxRate,
-        cityTaxRate: cityRecord.taxRate,
-        totalTaxRate: stateRecord.taxRate + countyRecord.taxRate + cityRecord.taxRate,
-        lastUpdated: new Date().toISOString()
+        stateTaxRate,
+        countyTaxRate,
+        cityTaxRate,
+        totalTaxRate,
+        lastUpdated: new Date().toISOString(),
+        stateCode: stateRecord.code,
+        hasDualRates,
+        rateType
       }
+
+      // Add dual-rate information for states like Illinois
+      if (hasDualRates) {
+        const stateFoodTaxRate = stateRecord.foodTaxRate || stateRecord.taxRate
+        const countyFoodTaxRate = countyRecord.foodTaxRate || countyRecord.taxRate
+        const cityFoodTaxRate = cityRecord.foodTaxRate || cityRecord.taxRate
+        const totalFoodTaxRate = stateFoodTaxRate + countyFoodTaxRate + cityFoodTaxRate
+
+        return {
+          ...baseResponse,
+          stateFoodTaxRate,
+          countyFoodTaxRate,
+          cityFoodTaxRate,
+          totalFoodTaxRate
+        }
+      }
+
+      return baseResponse
     } catch (error) {
       logger.error('Error getting tax rates:', error as Error)
       throw error

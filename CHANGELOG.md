@@ -8,13 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - 2025-05-30
 
 ### 🎯 Today's Roadmap
-- **Documentation Sync**: Update changelog to reflect actual version 0.1.17
+- **Documentation Sync**: Update changelog to reflect actual version 0.1.20
 - **Deployment Verification**: Confirm all fixes from v0.1.6-0.1.17 are working in production
 - **Outstanding Issues Investigation**:
   - VersionInfo component visibility on live site
   - Location detection state conversion (TX → Texas)
   - Cities dropdown returning 0 results for Rockwall County
 - **Feature Enhancement Planning**: Next phase development priorities
+
+### 🚀 **ILLINOIS STATE EXPANSION RESEARCH** ✅ COMPLETED
+
+**Research Question:** Does Illinois provide EDI-style tax data like Texas?
+**Answer:** YES! Illinois provides superior data sources to Texas.
+
+**Illinois Data Sources Available:**
+- ✅ **Machine-Readable Files**: County/Municipality + Address-specific files for developers
+- ✅ **MyTax Illinois Tax Rate Finder**: Interactive API-accessible lookup tool  
+- ✅ **Tax Matrix Downloads**: CSV/PDF formats with comprehensive rate breakdowns
+- ✅ **Dual Rate System**: 6.25% general, 1% food/medicine (restaurant-specific benefit)
+- ✅ **Quarterly Updates**: January 1 and July 1 (more frequent than Texas)
+- ✅ **102 Counties Coverage**: Complete Illinois state coverage
+
+**Implementation Complexity:** MEDIUM
+- More sophisticated than Texas (dual rates, origin/destination sourcing)
+- Better data availability and API access
+- Restaurant-focused benefits (food rate differentiation)
+
+**Next Steps for Illinois Integration:**
+1. Update state selection dropdown to include Illinois
+2. Create Illinois data importer service (similar to TaxDataImporter.ts)
+3. Add dual-rate support to database schema
+4. Implement destination/origin sourcing logic
+5. Update frontend UI to show rate breakdowns for restaurants
+
+## [0.1.20] - 2025-05-30 ✅ DEPLOYED
+
+### Fixed
+- **Node Engine Warnings**: Updated backend Node requirement from "18.x" to ">=18.0.0" to support Vercel's Node v22.15.1
+- **Root Package Engines**: Added Node/npm engine requirements to root package.json for workspace consistency
+- **ESLint Dependencies**: Fixed version conflicts by using compatible ESLint 8.57.0 instead of 9.x
+- **Dependency Resolution**: Cleared npm cache and resolved ERESOLVE conflicts in backend packages
+
+### Build & Deploy
+- **Clean Build**: Successfully compiled and deployed without engine warnings
+- **Documentation**: Auto-generated user guide v0.1.20 with fresh screenshots
+- **Version Consistency**: All subsystems now properly aligned at v0.1.20
+
+### Status Summary
+- **Vercel Deployment**: Should now build without Node engine warnings ✅
+- **Backend Compatibility**: Updated to support Node 18+ through 22+ ✅
+- **Documentation**: PDF user guide updated and available ✅
+
+## [0.1.19] - 2025-05-30 🚫 SKIPPED
+*Version skipped during dependency resolution*
 
 ## [0.1.18] - 2025-05-30 ✅ DEPLOYED
 

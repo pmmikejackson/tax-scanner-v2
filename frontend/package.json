@@ -1,6 +1,6 @@
 {
   "name": "tax-scanner-frontend",
-  "version": "0.1.20",
+  "version": "0.1.22",
   "private": true,
   "scripts": {
     "dev": "next dev",

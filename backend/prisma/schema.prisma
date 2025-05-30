@@ -12,9 +12,11 @@ datasource db {
 
 model State {
   id        String   @id @default(cuid())
-  code      String   @unique // TX, CA, etc.
-  name      String   // Texas, California, etc.
+  code      String   @unique // TX, IL, etc.
+  name      String   // Texas, Illinois, etc.
   taxRate   Float    // State sales tax rate
+  // Illinois-specific: Food tax rate (1% for food/medicine vs 6.25% general)
+  foodTaxRate Float?  // Optional food tax rate (Illinois: 1%, Texas: same as general)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -28,6 +30,8 @@ model County {
   id        String   @id @default(cuid())
   name      String
   taxRate   Float    // County sales tax rate
+  // Illinois-specific: Food tax rate for counties that have differential rates
+  foodTaxRate Float?  // Optional county food tax rate
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -46,6 +50,8 @@ model City {
   id        String   @id @default(cuid())
   name      String
   taxRate   Float    // City sales tax rate
+  // Illinois-specific: Food tax rate for cities that have differential rates
+  foodTaxRate Float?  // Optional city food tax rate
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

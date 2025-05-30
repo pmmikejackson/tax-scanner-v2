@@ -14,6 +14,15 @@ export interface TaxData {
   cityTaxRate: number
   totalTaxRate: number
   lastUpdated: string
+  // Illinois dual-rate support
+  stateFoodTaxRate?: number
+  countyFoodTaxRate?: number
+  cityFoodTaxRate?: number
+  totalFoodTaxRate?: number
+  // Additional metadata
+  stateCode: string
+  hasDualRates: boolean // True if state supports different rates for food vs general items
+  rateType: 'single' | 'dual' // 'single' for states like Texas, 'dual' for Illinois
 }
 
 export interface LocationOption {
