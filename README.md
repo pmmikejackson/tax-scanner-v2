@@ -65,4 +65,4 @@ The application is designed for easy deployment:
 
 ## License
 
-MIT License - see LICENSE file for details. 
+MIT License - see LICENSE file for details. # Trigger Vercel redeploy - revert to working state v0.1.22
