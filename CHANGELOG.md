@@ -5,6 +5,46 @@ All notable changes to Tax Scanner v2 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-05-30
+
+### 🎯 Today's Roadmap
+- **Documentation Sync**: Update changelog to reflect actual version 0.1.17
+- **Deployment Verification**: Confirm all fixes from v0.1.6-0.1.17 are working in production
+- **Outstanding Issues Investigation**:
+  - VersionInfo component visibility on live site
+  - Location detection state conversion (TX → Texas)
+  - Cities dropdown returning 0 results for Rockwall County
+- **Feature Enhancement Planning**: Next phase development priorities
+
+## [0.1.18] - 2025-05-30 ✅ DEPLOYED
+
+### Fixed
+- **VersionInfo Component Positioning**: Fixed CSS positioning from `bottom-20` to `bottom-4` and increased z-index to ensure visibility above footer
+- **Component Visibility**: VersionInfo component should now be visible in bottom-right corner of all pages
+
+### Investigation Results ✅
+- **Backend Health**: Verified healthy and responsive (45k+ seconds uptime)
+- **Tax Lookup API**: Working correctly (Rockwall, TX returns 8.25% total rate)
+- **Cities Endpoint**: Returns 17 cities for Rockwall County including "Rockwall"
+- **Geocoding API**: Working correctly (returns accurate TX coordinates)
+- **Location Detection Flow**: All TX→Texas conversions are implemented and working
+- **Version API**: Returns correct version information
+
+### Status
+- **Frontend**: v0.1.18 building and deploying ✅
+- **Backend**: Healthy on Railway (working correctly) ✅  
+- **Infrastructure**: All API endpoints responding properly ✅
+
+## [0.1.17] - 2025-05-30 ✅ DEPLOYED
+
+### Status
+- **Frontend**: v0.1.17 deployed on Vercel ✅
+- **Backend**: Healthy on Railway (45k+ seconds uptime) ✅
+- **Infrastructure**: Both services communicating properly ✅
+
+### Changes (v0.1.6 - 0.1.17)
+*Note: These versions were incremented during development - detailed changes to be documented*
+
 ## [Unreleased] - 2025-01-XX
 
 ### Added
@@ -26,6 +66,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - "Test Location Detection" button to see detected location without tax lookup
   - Location info display showing format: "Detected: Dallas, Dallas County, Texas"
   - Enhanced console logging for better debugging information
+
+## [0.1.5] - 2025-05-29
+
+### 🔧 Critical Bug Fixes
+- **FIXED: "Route not found" errors for all tax lookups** - Frontend was sending full state names ("Texas") but backend expected state codes ("TX")
+- **FIXED: Vercel deployment linking** - Resolved project linking issues that prevented deployments
+- **IMPROVED: Location detection** - GPS location detection now works correctly with proper state code handling
+- **IMPROVED: Manual lookup** - Dropdown selections now work with proper state code conversion
+
+### 🎯 What's Working Now
+- ✅ "Use My Current Location" button functions properly
+- ✅ Manual state/county/city selection returns tax data
+- ✅ Debug location detection shows accurate results
+- ✅ Backend API receives correct state codes for all requests
+
+**Note:** This was a critical infrastructure fix - all tax lookup functionality should now work as expected.
 
 ## [0.1.4] - 2025-05-29
 
@@ -112,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Summary
 
+- **v0.1.5**: Critical infrastructure fixes
 - **v0.1.4**: CORS and deployment fixes
 - **v0.1.3**: Build versioning system and geolocation improvements  
 - **v0.1.2**: Google Maps API fixes

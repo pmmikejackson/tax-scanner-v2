@@ -13,9 +13,11 @@ interface TaxLookupFormProps {
     county: string
     city: string
   }
+  // Callback to clear selectedLocation when user manually interacts with form
+  onClearSelectedLocation?: () => void
 }
 
-export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }: TaxLookupFormProps) {
+export default function TaxLookupForm({ onLookup, isLoading, selectedLocation, onClearSelectedLocation }: TaxLookupFormProps) {
   // Form state - stores the selected values for dropdowns
   const [selectedState, setSelectedState] = useState('')
   const [selectedCounty, setSelectedCounty] = useState('')
@@ -39,10 +41,32 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
   // When parent component detects user location via GPS/geocoding,
   // automatically update form selections to match detected location
   useEffect(() => {
-    if (selectedLocation) {
-      // Find state by name and set it (triggers county loading via next effect)
+    console.log('📝 TaxLookupForm received selectedLocation:', selectedLocation)
+    console.log('📝 States array length:', states.length)
+    
+    // If selectedLocation is cleared (undefined), reset form to allow manual interaction
+    if (selectedLocation === undefined) {
+      console.log('📝 selectedLocation cleared - resetting form for manual interaction')
+      setSelectedState('')
+      setSelectedCounty('')
+      setSelectedCity('')
+      setCounties([])
+      setCities([])
+      return
+    }
+    
+    if (selectedLocation && states.length > 0) {
       const state = states.find(s => s.name === selectedLocation.state)
+      console.log('📝 Looking for state name:', selectedLocation.state, 'Found:', state)
+      
       if (state) {
+        // Clear existing selections first to ensure clean state
+        setSelectedCounty('')
+        setSelectedCity('')
+        setCounties([])
+        setCities([])
+        
+        console.log('📝 Setting selectedState to:', state.value)
         setSelectedState(state.value)
         // Note: counties and cities will load automatically via other effects
       }
@@ -52,24 +76,45 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
   // Auto-select county when it becomes available after location detection
   // This runs after counties are loaded and we have a selectedLocation
   useEffect(() => {
-    if (selectedLocation && counties.length > 0 && !selectedCounty) {
+    console.log('📝 County effect triggered - selectedLocation:', selectedLocation?.county, 'counties:', counties.length)
+    
+    if (selectedLocation && counties.length > 0) {
+      console.log('📝 Looking for county:', selectedLocation.county)
       const county = counties.find(c => c.name === selectedLocation.county)
+      console.log('📝 Found county:', county)
+      console.log('📝 Available counties:', counties.map(c => c.name))
+      
       if (county) {
         setSelectedCounty(county.value)
+        console.log('📝 Setting county to:', county.value)
+        // Clear cities to ensure clean state
+        setCities([])
+        setSelectedCity('')
+      } else {
+        console.warn('📝 County not found in dropdown options:', selectedLocation.county)
       }
     }
-  }, [selectedLocation, counties, selectedCounty])
+  }, [selectedLocation, counties])
 
   // Auto-select city when it becomes available after location detection
   // This runs after cities are loaded and we have a selectedLocation
   useEffect(() => {
-    if (selectedLocation && cities.length > 0 && !selectedCity) {
+    console.log('📝 City effect triggered - selectedLocation:', selectedLocation?.city, 'cities:', cities.length)
+    
+    if (selectedLocation && cities.length > 0) {
+      console.log('📝 Looking for city:', selectedLocation.city)
       const city = cities.find(c => c.name === selectedLocation.city)
+      console.log('📝 Found city:', city)
+      console.log('📝 Available cities:', cities.map(c => c.name))
+      
       if (city) {
         setSelectedCity(city.value)
+        console.log('📝 Setting city to:', city.value)
+      } else {
+        console.warn('📝 City not found in dropdown options:', selectedLocation.city)
       }
     }
-  }, [selectedLocation, cities, selectedCity])
+  }, [selectedLocation, cities])
 
   // Load counties when state changes (both manual selection and auto-selection)
   useEffect(() => {
@@ -124,7 +169,9 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
     try {
       setIsLoadingData(true)
       setError(null)
+      console.log('📝 Loading counties for state:', stateCode)
       const countiesData = await apiClient.getCounties(stateCode)
+      console.log('📝 Loaded counties:', countiesData.length, 'counties:', countiesData.map(c => c.name))
       setCounties(countiesData)
       // Clear dependent selections when counties reload
       setSelectedCounty('')
@@ -169,22 +216,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
       const citiesData = await apiClient.getCities(stateCode, actualCountyName)
       console.log(`Loaded ${citiesData.length} cities:`, citiesData)
       
-      // Temporary debug alert for Rockwall testing (remove when stable)
-      if (actualCountyName.toLowerCase().includes('rockwall')) {
-        alert(`Debug: Found ${citiesData.length} cities for ${actualCountyName}`)
-      }
-      
       setCities(citiesData)
       setSelectedCity('') // Clear city selection when cities reload
     } catch (err) {
       console.error('Error loading cities:', err)
       const errorMsg = `Failed to load cities for ${countyValue}. Error: ${err instanceof Error ? err.message : 'Unknown error'}`
       setError(errorMsg)
-      
-      // Temporary debug alert for Rockwall testing (remove when stable)
-      if (countyValue.toLowerCase().includes('rockwall')) {
-        alert(`Debug Error: ${errorMsg}`)
-      }
       
       setCities([])
     } finally {
@@ -230,7 +267,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
         <select
           id="state"
           value={selectedState}
-          onChange={(e) => setSelectedState(e.target.value)}
+          onChange={(e) => {
+            setSelectedState(e.target.value)
+            if (onClearSelectedLocation) {
+              onClearSelectedLocation()
+            }
+          }}
           className="input-field"
           disabled={isDisabled}
           required
@@ -252,7 +294,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
         <select
           id="county"
           value={selectedCounty}
-          onChange={(e) => setSelectedCounty(e.target.value)}
+          onChange={(e) => {
+            setSelectedCounty(e.target.value)
+            if (onClearSelectedLocation) {
+              onClearSelectedLocation()
+            }
+          }}
           className="input-field"
           disabled={isDisabled || !selectedState}
           required
@@ -276,7 +323,12 @@ export default function TaxLookupForm({ onLookup, isLoading, selectedLocation }:
         <select
           id="city"
           value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
+          onChange={(e) => {
+            setSelectedCity(e.target.value)
+            if (onClearSelectedLocation) {
+              onClearSelectedLocation()
+            }
+          }}
           className="input-field"
           disabled={isDisabled || !selectedCounty}
           required

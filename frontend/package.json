@@ -1,14 +1,14 @@
 {
   "name": "tax-scanner-frontend",
-  "version": "0.1.4",
+  "version": "0.1.18",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "build:custom": "node scripts/build.js",
-    "build:deploy": "npm run version:patch && npm run build:custom",
-    "build:feature": "npm run version:minor && npm run build:custom",
-    "build:major": "npm run version:major && npm run build:custom",
+    "build:deploy": "npm run version:patch && npm run build:custom && npm run docs:generate",
+    "build:feature": "npm run version:minor && npm run build:custom && npm run docs:generate",
+    "build:major": "npm run version:major && npm run build:custom && npm run docs:generate",
     "version:patch": "npm version patch --no-git-tag-version",
     "version:minor": "npm version minor --no-git-tag-version",
     "version:major": "npm version major --no-git-tag-version",

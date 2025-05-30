@@ -16,8 +16,6 @@ export default function HomePage() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null) // GPS coordinates
   // Location detected from GPS + geocoding - passed to form to auto-populate dropdowns
   const [detectedLocation, setDetectedLocation] = useState<{state: string, county: string, city: string} | undefined>(undefined)
-  // Add state for showing detected location info
-  const [detectedLocationInfo, setDetectedLocationInfo] = useState<string | null>(null)
 
   // LOCATION DETECTION FLOW
   /**
@@ -75,28 +73,35 @@ export default function HomePage() {
       console.log('Geocoding result:', locationData)
       
       if (locationData) {
-        // IMPORTANT: Convert state code to state name for form compatibility
-        // Geocoding returns "TX" but form expects "Texas"
+        // Keep the original state code for API calls
+        const stateCode = locationData.state
+        
+        // Convert state code to full name for UI display only
         let stateName = locationData.state
         if (locationData.state === 'TX') {
           stateName = 'Texas'
         }
         // Add more state conversions as needed when expanding beyond Texas
         
-        console.log(`Looking up tax rates for: ${stateName}, ${locationData.county}, ${locationData.city}`)
+        console.log(`Looking up tax rates for: ${stateCode}, ${locationData.county}, ${locationData.city}`)
         
         try {
-          // Get tax rates for the detected location using converted state name
-          const taxData = await apiClient.getTaxRates(stateName, locationData.county, locationData.city)
+          // IMPORTANT: Send state CODE to backend API, not full name
+          const taxData = await apiClient.getTaxRates(stateCode, locationData.county, locationData.city)
           
           // Update results and form
           setTaxData(taxData)
           setError(null)
           
-          // IMPORTANT: Set detected location with converted state name to auto-populate form dropdowns
+          // IMPORTANT: Set detected location with full state name for UI display
           // This triggers the TaxLookupForm to update its selections
+          console.log('🔄 Setting detected location for form auto-population:', {
+            state: stateName,
+            county: locationData.county,
+            city: locationData.city
+          })
           setDetectedLocation({
-            state: stateName,           // Use converted name, not code
+            state: stateName,           // Use converted name for UI, not code
             county: locationData.county,
             city: locationData.city
           })
@@ -134,66 +139,44 @@ export default function HomePage() {
     setError(null)
     
     try {
-      const data = await apiClient.getTaxRates(state, county, city)
+      // Convert state name back to state code for API call
+      // The form sends full names but the backend expects state codes
+      let stateCode = state
+      if (state === 'Texas') {
+        stateCode = 'TX'
+      }
+      // Add more state conversions as needed when expanding beyond Texas
+      
+      console.log(`Manual lookup: Converting "${state}" to "${stateCode}" for API call`)
+      
+      const data = await apiClient.getTaxRates(stateCode, county, city)
       setTaxData(data)
     } catch (err) {
       console.error('Manual lookup error:', err)
-      setError('Failed to lookup tax data. Please try again.')
+      
+      // Provide more helpful error message for missing tax data
+      const errorMessage = err instanceof Error && err.message.includes('Tax rates not found') 
+        ? `No tax data found for ${city}, ${county}. This city may not have municipal taxes or data may be unavailable. Try selecting a nearby larger city in the same county for reference.
+
+💡 **Suggestion:** Many small towns use the county tax rate. Try selecting the county seat or largest city in ${county} County for a similar rate.`
+        : 'Failed to lookup tax data. Please try again.'
+      
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
 
   /**
-   * Test location detection without tax lookup - for debugging
+   * Clears the detected location - called when user manually interacts with form
+   * This prevents GPS location from overriding manual selections
    */
-  const testLocationDetection = async () => {
-    if (!navigator.geolocation) {
-      setDetectedLocationInfo('Geolocation is not supported by this browser.')
-      return
-    }
-
-    setIsLoading(true)
-    setDetectedLocationInfo(null)
-    
-    try {
-      // Get GPS coordinates from browser
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 600000 // Cache for 10 minutes
-        })
-      })
-      
-      console.log(`Got coordinates: ${position.coords.latitude}, ${position.coords.longitude}`)
-      
-      // Use Google Maps Geocoding API to convert coordinates to location names
-      const locationData = await apiClient.geocodeAddress(`${position.coords.latitude},${position.coords.longitude}`)
-      
-      if (locationData) {
-        let stateName = locationData.state
-        if (locationData.state === 'TX') {
-          stateName = 'Texas'
-        }
-        
-        setDetectedLocationInfo(`Detected: ${locationData.city}, ${locationData.county}, ${stateName}`)
-        
-        // Also set detected location for form auto-population
-        setDetectedLocation({
-          state: stateName,
-          county: locationData.county,
-          city: locationData.city
-        })
-      } else {
-        setDetectedLocationInfo('Could not determine location from coordinates.')
-      }
-    } catch (err) {
-      console.error('Location detection test error:', err)
-      setDetectedLocationInfo('Failed to detect location.')
-    } finally {
-      setIsLoading(false)
-    }
+  const clearDetectedLocation = () => {
+    console.log('🧹 Clearing detected location to allow manual form interaction')
+    setDetectedLocation(undefined)
+    // Also clear any tax data to prevent confusion
+    setTaxData(null)
+    setError(null)
   }
 
   return (
@@ -237,24 +220,6 @@ export default function HomePage() {
                 {isLoading ? 'Detecting Location...' : 'Use My Current Location'}
               </button>
               
-              <button
-                onClick={testLocationDetection}
-                disabled={isLoading}
-                className="w-full mb-4 px-4 py-2 text-sm border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors"
-              >
-                🧪 Test Location Detection (Debug)
-              </button>
-              
-              {detectedLocationInfo && (
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-700">{detectedLocationInfo}</p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    If this location doesn't match your actual location, or if tax lookup fails, 
-                    try using the manual dropdowns below.
-                  </p>
-                </div>
-              )}
-              
               <div className="text-center text-gray-500 text-sm">
                 or select manually below
               </div>
@@ -265,6 +230,7 @@ export default function HomePage() {
               onLookup={handleManualLookup}
               isLoading={isLoading}
               selectedLocation={detectedLocation}
+              onClearSelectedLocation={clearDetectedLocation}
             />
 
             {error && (

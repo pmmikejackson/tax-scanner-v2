@@ -20,21 +20,13 @@ export default function UserGuide() {
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      const response = await fetch('/api/generate-guide');
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'tax-scanner-user-guide.pdf';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } else {
-        console.error('Failed to generate PDF');
-        alert('Sorry, there was an error generating the PDF. Please try again later.');
-      }
+      // Direct download of the pre-generated PDF
+      const a = document.createElement('a');
+      a.href = '/tax-scanner-user-guide.pdf';
+      a.download = 'tax-scanner-user-guide.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading PDF:', error);
       alert('Sorry, there was an error downloading the PDF. Please try again later.');
@@ -527,7 +519,7 @@ export default function UserGuide() {
         {/* Footer */}
         <div className="bg-gray-100 rounded-xl p-8 text-center">
           <p className="text-lg font-bold text-gray-900 mb-2">Tax Scanner v2</p>
-          <p className="text-gray-600 mb-2">© 2024 Tax Scanner • Data from the Texas Comptroller's office</p>
+          <p className="text-gray-600 mb-2">© 2025 Tax Scanner • Data from the Texas Comptroller's office</p>
           <div className="flex justify-center space-x-4 mt-4">
             <Link 
               href="/"

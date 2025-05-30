@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #333;
             max-width: 800px;
             margin: 0 auto;
@@ -16,86 +16,197 @@
         }
         .header {
             text-align: center;
-            border-bottom: 3px solid #0066cc;
+            border-bottom: 3px solid #2563eb;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #0066cc;
+            color: #2563eb;
             margin: 0;
             font-size: 2.5em;
         }
+        .header p {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
         .version-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 10px;
             margin: 20px 0;
-            border-left: 4px solid #0066cc;
+            border-left: 5px solid #2563eb;
         }
         .section {
             margin: 40px 0;
             page-break-inside: avoid;
         }
         .section h2 {
-            color: #0066cc;
-            border-bottom: 2px solid #e9ecef;
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
             padding-bottom: 10px;
+            font-size: 1.8em;
         }
         .screenshot {
-            margin: 20px 0;
+            margin: 30px 0;
             text-align: center;
             page-break-inside: avoid;
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
         }
         .screenshot img {
             max-width: 100%;
             height: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .screenshot-caption {
-            font-style: italic;
-            color: #666;
-            margin-top: 10px;
-            font-size: 0.9em;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 15px;
+            font-size: 1.1em;
         }
-        .feature-list {
-            background: #f8f9fa;
+        .mobile-screenshot {
+            margin: 15px 0;
+            padding: 15px;
+        }
+        .mobile-screenshot img {
+            border-radius: 15px !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        .mobile-screenshot .screenshot-caption {
+            margin-top: 10px;
+            font-size: 1em;
+        }
+        .mobile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 30px 0;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .mobile-column {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            background: #f9fafb;
             padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        .ipad-mockup {
+            position: relative;
+            background: #1f2937;
+            border-radius: 15px;
+            padding: 20px 15px;
+            margin: 0 auto 15px;
+            width: fit-content;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid #374151;
+        }
+        .ipad-mockup::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 3px;
+        }
+        .ipad-mockup::after {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: #6b7280;
+            border-radius: 2px;
+        }
+        .ipad-mockup img {
             border-radius: 8px;
+            display: block;
+            max-width: 280px;
+            width: 280px;
+            height: auto;
+            border: 1px solid #4b5563;
+        }
+        .highlight-box {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .tip-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 20px;
+            border-radius: 10px;
             margin: 20px 0;
         }
         .step {
             background: #fff;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
             position: relative;
-            padding-left: 60px;
+            padding-left: 70px;
         }
         .step-number {
             position: absolute;
-            left: 20px;
-            top: 20px;
-            background: #0066cc;
+            left: 25px;
+            top: 25px;
+            background: #2563eb;
             color: white;
-            width: 25px;
-            height: 25px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 1.1em;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #1f2937;
+            font-size: 1.3em;
         }
         .footer {
             text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
-            color: #666;
-            font-size: 0.9em;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 0.95em;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        strong {
+            color: #1f2937;
+        }
+        .friendly-intro {
+            background: #f0f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #2563eb;
+        }
+        .friendly-intro h3 {
+            color: #1e40af;
+            margin-top: 0;
         }
         @media print {
             body { margin: 0; }
@@ -106,218 +217,312 @@
 <body>
     <div class="header">
         <h1>{{title}}</h1>
-        <p>Comprehensive User Guide for Restaurant Owners</p>
+        <p>Your friendly guide to finding sales tax rates</p>
     </div>
 
     <div class="version-info">
-        <strong>Version:</strong> {{version}}<br>
-        <strong>Generated:</strong> {{generatedDate}} at {{generatedTime}}<br>
-        <strong>Application URL:</strong> <a href="{{appUrl}}">{{appUrl}}</a>
+        <strong>Guide Version:</strong> {{version}}<br>
+        <strong>Last Updated:</strong> {{generatedDate}} at {{generatedTime}}<br>
+        <strong>Website:</strong> <a href="{{appUrl}}">{{appUrl}}</a>
+    </div>
+
+    <div class="friendly-intro">
+        <h3>👋 Welcome!</h3>
+        <p>Hi there! This guide will help you get the most out of Tax Scanner. Whether you're a restaurant owner, manager, or just need to find sales tax rates quickly, we've got you covered. Don't worry if technology isn't your thing – we'll walk through everything step by step.</p>
     </div>
 
     <div class="section">
-        <h2>📖 Table of Contents</h2>
+        <h2>📖 What's in This Guide</h2>
         <ol>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#getting-started">Getting Started</a></li>
-            <li><a href="#using-location-detection">Using Location Detection</a></li>
-            <li><a href="#manual-selection">Manual Location Selection</a></li>
-            <li><a href="#understanding-results">Understanding Tax Results</a></li>
-            <li><a href="#mobile-usage">Mobile Usage</a></li>
-            <li><a href="#troubleshooting">Troubleshooting</a></li>
-            <li><a href="#support">Support & Contact</a></li>
+            <li><a href="#what-is-this">What is Tax Scanner?</a></li>
+            <li><a href="#getting-started">Getting Started (Super Easy!)</a></li>
+            <li><a href="#using-gps">Using GPS to Find Your Location</a></li>
+            <li><a href="#manual-selection">Picking Your Location Manually</a></li>
+            <li><a href="#reading-results">Understanding Your Results</a></li>
+            <li><a href="#mobile-tips">Using Tax Scanner on Your Phone</a></li>
+            <li><a href="#when-things-go-wrong">When Things Don't Work (Don't Panic!)</a></li>
+            <li><a href="#need-help">Need More Help?</a></li>
         </ol>
     </div>
 
-    <div class="section" id="overview">
-        <h2>🏢 Overview</h2>
-        <p>Tax Scanner v2 is a comprehensive sales tax lookup tool designed specifically for restaurant owners and managers. Our application provides accurate, up-to-date sales tax rates for locations across Texas.</p>
+    <div class="section" id="what-is-this">
+        <h2>🏢 What is Tax Scanner?</h2>
+        <p>Tax Scanner is a simple website that helps you find sales tax rates for any location in Texas. Think of it as your friendly tax rate calculator that's always available, right in your web browser.</p>
         
-        <div class="feature-list">
-            <h3>Key Features:</h3>
+        <div class="highlight-box">
+            <h3>Why You'll Love Tax Scanner:</h3>
             <ul>
-                <li><strong>GPS Location Detection:</strong> Automatically detect your current location</li>
-                <li><strong>Manual Selection:</strong> Browse by state, county, and city</li>
-                <li><strong>Real-time Tax Rates:</strong> Access to 3,628+ official tax rates</li>
-                <li><strong>Mobile Responsive:</strong> Works perfectly on phones and tablets</li>
-                <li><strong>Government Data:</strong> Sourced directly from Texas Comptroller's office</li>
+                <li><strong>No downloads needed</strong> – Just open your web browser and go!</li>
+                <li><strong>Works on everything</strong> – Your phone, tablet, computer, whatever you have</li>
+                <li><strong>Always up-to-date</strong> – We get our information straight from the Texas government</li>
+                <li><strong>Super fast</strong> – Find tax rates in seconds, not minutes</li>
+                <li><strong>Free to use</strong> – No hidden fees, no signup required</li>
             </ul>
         </div>
+
+        <p>We built this especially for restaurant owners and business managers who need accurate tax information quickly. No more digging through government websites or calling around – just simple, reliable tax rates at your fingertips.</p>
     </div>
 
-    {{#if screenshots}}
     <div class="section">
-        <h2>📱 Application Screenshots</h2>
+        <h2>📱 See Tax Scanner in Action</h2>
+        <p>Here's what Tax Scanner looks like when you use it. Don't worry if it looks different on your device – it automatically adjusts to fit your screen perfectly!</p>
+        
         {{#each screenshots}}
+        {{#if (contains name 'Mobile View')}}
+        {{! Mobile screenshots will be handled separately below }}
+        {{else}}
         <div class="screenshot">
-            <img src="{{path}}" alt="{{name}}">
+            {{#if imageData}}
+            <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" style="max-width: 100%; height: auto; {{#if ../isPDF}}max-height: 400px;{{/if}}" />
+            {{else}}
+            <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 15px; padding: 60px 40px; text-align: center; color: #64748b; font-size: 1.1em;">
+                <div style="font-size: 3em; margin-bottom: 20px;">📱💻</div>
+                <strong>Screenshot Unavailable</strong><br>
+                <p style="margin: 10px 0; font-size: 0.95em;">Visit <a href="{{../appUrl}}" style="color: #2563eb;">{{../appUrl}}</a> to see it in action!</p>
+            </div>
+            {{/if}}
             <div class="screenshot-caption">{{name}}</div>
         </div>
+        {{/if}}
         {{/each}}
+        
+        <div class="section">
+            <h2>📱 Tablet Interface</h2>
+            <p>Here's how Tax Scanner looks and works on your tablet or large mobile device:</p>
+            
+            <div class="mobile-row">
+                {{#each screenshots}}
+                {{#if (contains name 'Mobile View - Header')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 1: Location Detection</h3>
+                    <p>Tap "Use My Current Location" for instant GPS detection, or scroll down to select your location manually from the dropdowns.</p>
+                </div>
+                {{/if}}
+                {{#if (contains name 'Mobile View - Selection Form')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 2: Manual Selection</h3>
+                    <p>Choose your state, county, and city from the easy-to-use dropdown menus if GPS detection isn't available or accurate.</p>
+                </div>
+                {{/if}}
+                {{#if (contains name 'Mobile View - Information')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 3: App Information</h3>
+                    <p>Learn about Tax Scanner's features, data sources, and how we keep your information accurate and up-to-date.</p>
+                </div>
+                {{/if}}
+                {{/each}}
+            </div>
+        </div>
     </div>
-    {{/if}}
 
     <div class="page-break"></div>
 
     <div class="section" id="getting-started">
-        <h2>🚀 Getting Started</h2>
-        <p>Tax Scanner v2 is accessible through any modern web browser. No installation required!</p>
+        <h2>🚀 Getting Started (Super Easy!)</h2>
+        <p>Ready to find some tax rates? Great! It literally takes less than a minute. Here's all you need to do:</p>
         
         <div class="step">
             <div class="step-number">1</div>
-            <h3>Access the Application</h3>
-            <p>Open your web browser and navigate to: <strong>{{appUrl}}</strong></p>
+            <h3>Open Your Web Browser</h3>
+            <p>Use whatever browser you normally use – Chrome, Safari, Firefox, Edge, they all work perfectly. On your phone, computer, or tablet.</p>
         </div>
 
         <div class="step">
             <div class="step-number">2</div>
-            <h3>Choose Your Method</h3>
-            <p>You have two options to find tax rates:</p>
+            <h3>Go to Tax Scanner</h3>
+            <p>Type this address in your browser: <strong>{{appUrl}}</strong></p>
+            <p>Or bookmark it so you can find it easily next time!</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Choose How You Want to Find Your Location</h3>
+            <p>You have two super easy options:</p>
             <ul>
-                <li><strong>GPS Detection:</strong> Click "Use My Current Location" for automatic detection</li>
-                <li><strong>Manual Selection:</strong> Choose state, county, and city from dropdown menus</li>
+                <li><strong>"Use My Current Location" button</strong> – Let your device figure out where you are (fastest way!)</li>
+                <li><strong>Pick from the dropdowns</strong> – Choose your state, county, and city manually</li>
             </ul>
         </div>
 
         <div class="step">
-            <div class="step-number">3</div>
-            <h3>View Results</h3>
-            <p>Once you've selected a location, click "Get Tax Rates" to see detailed tax information including state, county, and city rates.</p>
+            <div class="step-number">4</div>
+            <h3>Get Your Tax Rates!</h3>
+            <p>Click "Get Tax Rates" and boom – you'll see all the tax information for your location. That's it!</p>
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 Pro Tip:</strong> The location button is usually faster, but if you're inside a big building or somewhere with poor GPS, the dropdown menus might work better.
         </div>
     </div>
 
-    <div class="section" id="using-location-detection">
-        <h2>📍 Using Location Detection</h2>
-        <p>The GPS location detection feature provides the fastest way to find tax rates for your current location.</p>
+    <div class="section" id="using-gps">
+        <h2>📍 Using GPS to Find Your Location</h2>
+        <p>This is the fastest way to get tax rates – just let your device do the work for you!</p>
         
         <div class="step">
             <div class="step-number">1</div>
-            <h3>Enable Location Access</h3>
-            <p>Click the "Use My Current Location" button. Your browser will ask for permission to access your location.</p>
+            <h3>Click "Use My Current Location"</h3>
+            <p>You'll see a big blue button with a location icon. Just click it!</p>
         </div>
 
         <div class="step">
             <div class="step-number">2</div>
-            <h3>Grant Permission</h3>
-            <p>Click "Allow" when prompted. This enables the app to detect your GPS coordinates.</p>
+            <h3>Say "Allow" When Your Browser Asks</h3>
+            <p>Your browser will pop up a little message asking if Tax Scanner can access your location. Click "Allow" or "Yes" – we promise we only use it to find tax rates and nothing else!</p>
         </div>
 
         <div class="step">
             <div class="step-number">3</div>
-            <h3>Automatic Form Population</h3>
-            <p>The app will automatically fill in the state, county, and city dropdowns based on your detected location.</p>
+            <h3>Watch the Magic Happen</h3>
+            <p>Tax Scanner will automatically fill in your state, county, and city. Pretty cool, right?</p>
         </div>
 
         <div class="step">
             <div class="step-number">4</div>
-            <h3>Get Tax Rates</h3>
-            <p>Click "Get Tax Rates" to see the complete tax breakdown for your location.</p>
+            <h3>Click "Get Tax Rates"</h3>
+            <p>And you're done! You'll see all your tax information in just a few seconds.</p>
+        </div>
+
+        <div class="tip-box">
+            <strong>🤔 Not Working?</strong> No worries! Sometimes GPS takes a moment to warm up, especially if you're indoors. Try moving closer to a window, or just use the dropdown menus instead – they work just as well!
         </div>
     </div>
 
     <div class="section" id="manual-selection">
-        <h2>📋 Manual Location Selection</h2>
-        <p>For precise control or when GPS isn't available, use the manual selection dropdowns.</p>
+        <h2>📋 Picking Your Location Manually</h2>
+        <p>Sometimes you want to be extra precise, or maybe GPS isn't working great. No problem! The dropdown menus are super simple to use.</p>
         
         <div class="step">
             <div class="step-number">1</div>
-            <h3>Select State</h3>
-            <p>Choose your state from the first dropdown. Currently, Texas is supported with comprehensive coverage.</p>
+            <h3>Pick Your State</h3>
+            <p>Click on the first dropdown that says "Select a state" and choose Texas. (Right now, we focus on Texas, but we're working on adding more states!)</p>
         </div>
 
         <div class="step">
             <div class="step-number">2</div>
-            <h3>Choose County</h3>
-            <p>After selecting a state, the county dropdown will populate with all available counties. Select your county.</p>
+            <h3>Choose Your County</h3>
+            <p>After you pick Texas, the second dropdown will light up with all the counties. Find yours and click it. They're in alphabetical order to make it easy to find.</p>
         </div>
 
         <div class="step">
             <div class="step-number">3</div>
-            <h3>Pick City</h3>
-            <p>Finally, choose your city from the third dropdown. This will show all cities within the selected county.</p>
+            <h3>Select Your City</h3>
+            <p>Once you've chosen your county, the third dropdown will show all the cities in that county. Pick yours!</p>
         </div>
 
         <div class="step">
             <div class="step-number">4</div>
-            <h3>Submit</h3>
-            <p>Click "Get Tax Rates" to retrieve the tax information for your selected location.</p>
+            <h3>Get Your Results</h3>
+            <p>Click the "Get Tax Rates" button and you'll see all your tax information.</p>
+        </div>
+
+        <div class="highlight-box">
+            <strong>✨ Cool Feature:</strong> As you make selections, the dropdowns automatically update to show only the relevant options. This makes it impossible to pick invalid combinations!
         </div>
     </div>
 
-    <div class="section" id="understanding-results">
-        <h2>📊 Understanding Tax Results</h2>
-        <p>Tax Scanner provides a comprehensive breakdown of all applicable sales tax rates.</p>
+    <div class="section" id="reading-results">
+        <h2>📊 Understanding Your Results</h2>
+        <p>Great! You've got your tax rates. But what do all those numbers mean? Let's break it down in plain English:</p>
         
-        <div class="feature-list">
-            <h3>Tax Components:</h3>
+        <div class="highlight-box">
+            <h3>What You'll See:</h3>
             <ul>
-                <li><strong>State Tax:</strong> Texas state sales tax rate</li>
-                <li><strong>County Tax:</strong> Additional county-level tax</li>
-                <li><strong>City Tax:</strong> Municipal tax rates (if applicable)</li>
-                <li><strong>Total Tax Rate:</strong> Combined rate for easy calculation</li>
-                <li><strong>Last Updated:</strong> When the data was last refreshed</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="section" id="mobile-usage">
-        <h2>📱 Mobile Usage</h2>
-        <p>Tax Scanner v2 is fully optimized for mobile devices, allowing you to check tax rates on the go.</p>
-        
-        <ul>
-            <li><strong>Responsive Design:</strong> Adapts to any screen size</li>
-            <li><strong>Touch-Friendly:</strong> Large buttons and easy navigation</li>
-            <li><strong>Fast Loading:</strong> Optimized for mobile networks</li>
-            <li><strong>GPS Integration:</strong> Works seamlessly with mobile location services</li>
-        </ul>
-    </div>
-
-    <div class="section" id="troubleshooting">
-        <h2>🔧 Troubleshooting</h2>
-        
-        <h3>Location Detection Issues</h3>
-        <ul>
-            <li><strong>Permission Denied:</strong> Make sure you clicked "Allow" for location access</li>
-            <li><strong>Inaccurate Location:</strong> GPS may take a moment to get precise coordinates</li>
-            <li><strong>Indoor Usage:</strong> GPS works better near windows or outdoors</li>
-        </ul>
-
-        <h3>Dropdown Issues</h3>
-        <ul>
-            <li><strong>Counties Not Loading:</strong> Make sure you selected a state first</li>
-            <li><strong>Cities Not Showing:</strong> Ensure both state and county are selected</li>
-            <li><strong>Slow Loading:</strong> Check your internet connection</li>
-        </ul>
-
-        <h3>General Issues</h3>
-        <ul>
-            <li><strong>Page Not Loading:</strong> Refresh your browser or check internet connection</li>
-            <li><strong>Old Data:</strong> Clear your browser cache and reload</li>
-            <li><strong>Button Not Working:</strong> Make sure JavaScript is enabled</li>
-        </ul>
-    </div>
-
-    <div class="section" id="support">
-        <h2>📞 Support & Contact</h2>
-        <p>Need help with Tax Scanner v2? We're here to assist!</p>
-        
-        <div class="feature-list">
-            <h3>Support Resources:</h3>
-            <ul>
-                <li><strong>Application URL:</strong> <a href="{{appUrl}}">{{appUrl}}</a></li>
-                <li><strong>Data Source:</strong> Official Texas Comptroller EDI files</li>
-                <li><strong>Update Frequency:</strong> Quarterly updates from government sources</li>
-                <li><strong>Version:</strong> {{version}}</li>
+                <li><strong>State Tax</strong> – This is Texas's base sales tax rate (currently 6.25%)</li>
+                <li><strong>County Tax</strong> – Your county might add a little extra tax</li>
+                <li><strong>City Tax</strong> – Some cities add their own tax on top</li>
+                <li><strong>Total Tax Rate</strong> – This is the big number you care about! It's everything added together</li>
+                <li><strong>Last Updated</strong> – When we last got fresh data from the government</li>
             </ul>
         </div>
 
-        <p><strong>Important:</strong> Tax rates should be verified for compliance. This tool provides reference information based on official government data.</p>
+        <div class="tip-box">
+            <strong>💰 The Bottom Line:</strong> The "Total Tax Rate" is what you need for your business. That's the percentage you'll charge customers on top of your menu prices.
+        </div>
+
+        <p><strong>For example:</strong> If your total tax rate is 8.25% and someone orders $100 worth of food, you'd charge them $108.25 total ($100 + $8.25 in tax).</p>
+    </div>
+
+    <div class="section" id="mobile-tips">
+        <h2>📱 Using Tax Scanner on Your Phone</h2>
+        <p>Tax Scanner works beautifully on phones and tablets! Here are some tips to make it even easier:</p>
+        
+        <ul>
+            <li><strong>Add it to your home screen</strong> – In your browser, tap "Share" then "Add to Home Screen" for quick access</li>
+            <li><strong>GPS works great on phones</strong> – Your phone's location is usually very accurate</li>
+            <li><strong>Everything resizes perfectly</strong> – Buttons and text automatically get bigger for easy tapping</li>
+            <li><strong>Works offline too</strong> – Once you've loaded the page, you can use it even if your internet gets spotty</li>
+        </ul>
+
+        <div class="tip-box">
+            <strong>📱 Phone Tip:</strong> If you're using this at work a lot, bookmark it or add it to your home screen. You'll thank yourself later!
+        </div>
+    </div>
+
+    <div class="section" id="when-things-go-wrong">
+        <h2>🔧 When Things Don't Work (Don't Panic!)</h2>
+        <p>Sometimes technology has hiccups. Here are the most common issues and how to fix them quickly:</p>
+        
+        <h3>🗺️ Location Problems</h3>
+        <ul>
+            <li><strong>Browser says "location denied"</strong> – You accidentally clicked "Block." Just refresh the page and try again, clicking "Allow" this time</li>
+            <li><strong>Wrong location detected</strong> – GPS sometimes takes a minute to get precise. Try refreshing or just use the dropdown menus instead</li>
+            <li><strong>Location button doesn't work indoors</strong> – Totally normal! GPS doesn't work well inside big buildings. Use the dropdowns – they're just as fast</li>
+        </ul>
+
+        <h3>📋 Dropdown Problems</h3>
+        <ul>
+            <li><strong>Counties won't load</strong> – Make sure you picked a state first. The dropdowns work in order</li>
+            <li><strong>No cities showing up</strong> – Double-check that you've selected both a state and county</li>
+            <li><strong>Everything loads really slowly</strong> – Your internet might be having a slow day. Give it a moment, or try refreshing</li>
+        </ul>
+
+        <h3>🌐 General Website Issues</h3>
+        <ul>
+            <li><strong>Page won't load at all</strong> – Check your internet connection, or try again in a few minutes</li>
+            <li><strong>Looks weird or broken</strong> – Try refreshing the page (press F5 or pull down on mobile)</li>
+            <li><strong>Buttons don't work</strong> – Make sure JavaScript is enabled in your browser (it usually is by default)</li>
+        </ul>
+
+        <div class="highlight-box">
+            <strong>🛠️ Quick Fix for Everything:</strong> When in doubt, refresh the page! It fixes about 90% of website issues.
+        </div>
+    </div>
+
+    <div class="section" id="need-help">
+        <h2>📞 Need More Help?</h2>
+        <p>We're here to help! If something's not working or you have questions, here's what you need to know:</p>
+        
+        <div class="highlight-box">
+            <h3>📋 Quick Reference:</h3>
+            <ul>
+                <li><strong>Website:</strong> <a href="{{appUrl}}">{{appUrl}}</a></li>
+                <li><strong>What we cover:</strong> All of Texas (more states coming soon!)</li>
+                <li><strong>How often we update:</strong> Every few months when the government releases new data</li>
+                <li><strong>Cost:</strong> Completely free – no catch, no signup needed</li>
+            </ul>
+        </div>
+
+        <div class="tip-box">
+            <strong>⚖️ Important Legal Note:</strong> While we get our data directly from official government sources and keep it as current as possible, please double-check tax rates for any critical business decisions. Rules can change, and we want you to stay compliant!
+        </div>
+
+        <p><strong>Thanks for using Tax Scanner!</strong> We hope this makes your life a little easier. If you find it helpful, feel free to share it with other business owners who might need it too.</p>
     </div>
 
     <div class="footer">
-        <p>Tax Scanner v2 - Version {{version}}</p>
-        <p>Generated on {{generatedDate}} at {{generatedTime}}</p>
-        <p>© {{year}} Tax Scanner. Data sourced from the Texas Comptroller's office.</p>
+        <p><strong>Tax Scanner v2 - Version {{version}}</strong></p>
+        <p>This guide was created on {{generatedDate}} at {{generatedTime}}</p>
+        <p>© {{year}} Tax Scanner • Data from the Texas Comptroller's office</p>
     </div>
 </body>
 </html>

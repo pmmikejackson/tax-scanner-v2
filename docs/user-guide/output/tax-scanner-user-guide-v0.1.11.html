@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Scanner v2 - User Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #0066cc;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .version-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #0066cc;
+        }
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        .section h2 {
+            color: #0066cc;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .screenshot {
+            margin: 20px 0;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .feature-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            padding-left: 60px;
+        }
+        .step-number {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: #0066cc;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9em;
+        }
+        @media print {
+            body { margin: 0; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Tax Scanner v2 - User Guide</h1>
+        <p>Comprehensive User Guide for Restaurant Owners</p>
+    </div>
+
+    <div class="version-info">
+        <strong>Version:</strong> 0.1.11<br>
+        <strong>Generated:</strong> May 29th, 2025 at 7:18 PM<br>
+        <strong>Application URL:</strong> <a href="https://taxscanner.vercel.app">https://taxscanner.vercel.app</a>
+    </div>
+
+    <div class="section">
+        <h2>📖 Table of Contents</h2>
+        <ol>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#using-location-detection">Using Location Detection</a></li>
+            <li><a href="#manual-selection">Manual Location Selection</a></li>
+            <li><a href="#understanding-results">Understanding Tax Results</a></li>
+            <li><a href="#mobile-usage">Mobile Usage</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+            <li><a href="#support">Support & Contact</a></li>
+        </ol>
+    </div>
+
+    <div class="section" id="overview">
+        <h2>🏢 Overview</h2>
+        <p>Tax Scanner v2 is a comprehensive sales tax lookup tool designed specifically for restaurant owners and managers. Our application provides accurate, up-to-date sales tax rates for locations across Texas.</p>
+        
+        <div class="feature-list">
+            <h3>Key Features:</h3>
+            <ul>
+                <li><strong>GPS Location Detection:</strong> Automatically detect your current location</li>
+                <li><strong>Manual Selection:</strong> Browse by state, county, and city</li>
+                <li><strong>Real-time Tax Rates:</strong> Access to 3,628+ official tax rates</li>
+                <li><strong>Mobile Responsive:</strong> Works perfectly on phones and tablets</li>
+                <li><strong>Government Data:</strong> Sourced directly from Texas Comptroller's office</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📱 Application Screenshots</h2>
+        <div class="screenshot">
+            <img src="placeholder" alt="Homepage - Main Interface">
+            <div class="screenshot-caption">Homepage - Main Interface</div>
+        </div>
+        <div class="screenshot">
+            <img src="placeholder" alt="Location Detection Button">
+            <div class="screenshot-caption">Location Detection Button</div>
+        </div>
+        <div class="screenshot">
+            <img src="placeholder" alt="Manual Selection Dropdowns">
+            <div class="screenshot-caption">Manual Selection Dropdowns</div>
+        </div>
+        <div class="screenshot">
+            <img src="placeholder" alt="Tax Results Display">
+            <div class="screenshot-caption">Tax Results Display</div>
+        </div>
+        <div class="screenshot">
+            <img src="placeholder" alt="Mobile View">
+            <div class="screenshot-caption">Mobile View</div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section" id="getting-started">
+        <h2>🚀 Getting Started</h2>
+        <p>Tax Scanner v2 is accessible through any modern web browser. No installation required!</p>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Access the Application</h3>
+            <p>Open your web browser and navigate to: <strong>https://taxscanner.vercel.app</strong></p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>Choose Your Method</h3>
+            <p>You have two options to find tax rates:</p>
+            <ul>
+                <li><strong>GPS Detection:</strong> Click "Use My Current Location" for automatic detection</li>
+                <li><strong>Manual Selection:</strong> Choose state, county, and city from dropdown menus</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>View Results</h3>
+            <p>Once you've selected a location, click "Get Tax Rates" to see detailed tax information including state, county, and city rates.</p>
+        </div>
+    </div>
+
+    <div class="section" id="using-location-detection">
+        <h2>📍 Using Location Detection</h2>
+        <p>The GPS location detection feature provides the fastest way to find tax rates for your current location.</p>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Enable Location Access</h3>
+            <p>Click the "Use My Current Location" button. Your browser will ask for permission to access your location.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>Grant Permission</h3>
+            <p>Click "Allow" when prompted. This enables the app to detect your GPS coordinates.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Automatic Form Population</h3>
+            <p>The app will automatically fill in the state, county, and city dropdowns based on your detected location.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <h3>Get Tax Rates</h3>
+            <p>Click "Get Tax Rates" to see the complete tax breakdown for your location.</p>
+        </div>
+    </div>
+
+    <div class="section" id="manual-selection">
+        <h2>📋 Manual Location Selection</h2>
+        <p>For precise control or when GPS isn't available, use the manual selection dropdowns.</p>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Select State</h3>
+            <p>Choose your state from the first dropdown. Currently, Texas is supported with comprehensive coverage.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>Choose County</h3>
+            <p>After selecting a state, the county dropdown will populate with all available counties. Select your county.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Pick City</h3>
+            <p>Finally, choose your city from the third dropdown. This will show all cities within the selected county.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <h3>Submit</h3>
+            <p>Click "Get Tax Rates" to retrieve the tax information for your selected location.</p>
+        </div>
+    </div>
+
+    <div class="section" id="understanding-results">
+        <h2>📊 Understanding Tax Results</h2>
+        <p>Tax Scanner provides a comprehensive breakdown of all applicable sales tax rates.</p>
+        
+        <div class="feature-list">
+            <h3>Tax Components:</h3>
+            <ul>
+                <li><strong>State Tax:</strong> Texas state sales tax rate</li>
+                <li><strong>County Tax:</strong> Additional county-level tax</li>
+                <li><strong>City Tax:</strong> Municipal tax rates (if applicable)</li>
+                <li><strong>Total Tax Rate:</strong> Combined rate for easy calculation</li>
+                <li><strong>Last Updated:</strong> When the data was last refreshed</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section" id="mobile-usage">
+        <h2>📱 Mobile Usage</h2>
+        <p>Tax Scanner v2 is fully optimized for mobile devices, allowing you to check tax rates on the go.</p>
+        
+        <ul>
+            <li><strong>Responsive Design:</strong> Adapts to any screen size</li>
+            <li><strong>Touch-Friendly:</strong> Large buttons and easy navigation</li>
+            <li><strong>Fast Loading:</strong> Optimized for mobile networks</li>
+            <li><strong>GPS Integration:</strong> Works seamlessly with mobile location services</li>
+        </ul>
+    </div>
+
+    <div class="section" id="troubleshooting">
+        <h2>🔧 Troubleshooting</h2>
+        
+        <h3>Location Detection Issues</h3>
+        <ul>
+            <li><strong>Permission Denied:</strong> Make sure you clicked "Allow" for location access</li>
+            <li><strong>Inaccurate Location:</strong> GPS may take a moment to get precise coordinates</li>
+            <li><strong>Indoor Usage:</strong> GPS works better near windows or outdoors</li>
+        </ul>
+
+        <h3>Dropdown Issues</h3>
+        <ul>
+            <li><strong>Counties Not Loading:</strong> Make sure you selected a state first</li>
+            <li><strong>Cities Not Showing:</strong> Ensure both state and county are selected</li>
+            <li><strong>Slow Loading:</strong> Check your internet connection</li>
+        </ul>
+
+        <h3>General Issues</h3>
+        <ul>
+            <li><strong>Page Not Loading:</strong> Refresh your browser or check internet connection</li>
+            <li><strong>Old Data:</strong> Clear your browser cache and reload</li>
+            <li><strong>Button Not Working:</strong> Make sure JavaScript is enabled</li>
+        </ul>
+    </div>
+
+    <div class="section" id="support">
+        <h2>📞 Support & Contact</h2>
+        <p>Need help with Tax Scanner v2? We're here to assist!</p>
+        
+        <div class="feature-list">
+            <h3>Support Resources:</h3>
+            <ul>
+                <li><strong>Application URL:</strong> <a href="https://taxscanner.vercel.app">https://taxscanner.vercel.app</a></li>
+                <li><strong>Data Source:</strong> Official Texas Comptroller EDI files</li>
+                <li><strong>Update Frequency:</strong> Quarterly updates from government sources</li>
+                <li><strong>Version:</strong> 0.1.11</li>
+            </ul>
+        </div>
+
+        <p><strong>Important:</strong> Tax rates should be verified for compliance. This tool provides reference information based on official government data.</p>
+    </div>
+
+    <div class="footer">
+        <p>Tax Scanner v2 - Version 0.1.11</p>
+        <p>Generated on May 29th, 2025 at 7:18 PM</p>
+        <p>© 2025 Tax Scanner. Data sourced from the Texas Comptroller's office.</p>
+    </div>
+</body>
+</html>

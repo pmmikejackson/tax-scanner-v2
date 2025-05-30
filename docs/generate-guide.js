@@ -27,7 +27,7 @@ const CONFIG = {
   
   // Screenshot settings
   VIEWPORT: { width: 1920, height: 1080 },
-  MOBILE_VIEWPORT: { width: 375, height: 812 },
+  MOBILE_VIEWPORT: { width: 1024, height: 768 }, // iPad landscape
   
   // PDF settings
   PDF_OPTIONS: {
@@ -55,8 +55,20 @@ class UserGuideGenerator {
     // Create directories
     await this.ensureDirectories();
     
-    // Skip browser launch since we're not capturing screenshots
-    console.log('📖 Skipping browser launch (screenshots disabled)');
+    // Launch browser for screenshot capture
+    console.log('📖 Launching browser for screenshot capture...');
+    this.browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      timeout: 60000 // 60 second timeout
+    });
+    
+    this.page = await this.browser.newPage();
+    await this.page.setViewport(CONFIG.VIEWPORT);
+    
+    // Set longer timeout for page navigation
+    this.page.setDefaultNavigationTimeout(60000); // 60 seconds
+    this.page.setDefaultTimeout(60000); // 60 seconds
     
     // Read version from frontend package.json
     try {
@@ -77,27 +89,244 @@ class UserGuideGenerator {
   }
 
   async captureScreenshots() {
-    console.log('📸 Using placeholder screenshots (live capture disabled)...');
+    console.log('📸 Capturing live screenshots...');
     
-    // Return placeholder screenshots instead of capturing them
-    const screenshots = [
-      { name: 'Homepage - Main Interface', path: 'placeholder' },
-      { name: 'Location Detection Button', path: 'placeholder' },
-      { name: 'Manual Selection Dropdowns', path: 'placeholder' },
-      { name: 'Tax Results Display', path: 'placeholder' },
-      { name: 'Mobile View', path: 'placeholder' }
-    ];
+    const screenshots = [];
     
-    console.log(`📸 Using ${screenshots.length} placeholder screenshots`);
+    try {
+      // Wait for page to load completely
+      await this.page.goto(CONFIG.APP_URL, { 
+        waitUntil: 'networkidle0',
+        timeout: 60000 
+      });
+      
+      // Wait additional time for all elements to render
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // 1. Homepage - Main Interface
+      console.log('📸 Capturing: Homepage');
+      const homepagePath = path.join(CONFIG.IMAGES_DIR, 'homepage-main.png');
+      await this.page.screenshot({
+        path: homepagePath,
+        fullPage: true
+      });
+      const homepageData = await fs.readFile(homepagePath);
+      screenshots.push({
+        name: 'Homepage - Main Interface',
+        path: 'homepage-main.png',
+        imageData: homepageData.toString('base64')
+      });
+      
+      // 2. Focus on location button
+      console.log('📸 Capturing: Location Detection');
+      await this.page.evaluate(() => {
+        const button = document.querySelector('button[class*="btn-primary"]');
+        if (button) {
+          button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const buttonPath = path.join(CONFIG.IMAGES_DIR, 'location-button.png');
+      await this.page.screenshot({
+        path: buttonPath,
+        fullPage: false
+      });
+      const buttonData = await fs.readFile(buttonPath);
+      screenshots.push({
+        name: 'Location Detection Button',
+        path: 'location-button.png',
+        imageData: buttonData.toString('base64')
+      });
+      
+      // 3. Manual Selection Dropdowns (focus on form)
+      console.log('📸 Capturing: Manual Selection');
+      await this.page.evaluate(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const formPath = path.join(CONFIG.IMAGES_DIR, 'manual-selection.png');
+      await this.page.screenshot({
+        path: formPath,
+        fullPage: false
+      });
+      const formData = await fs.readFile(formPath);
+      screenshots.push({
+        name: 'Manual Selection Dropdowns',
+        path: 'manual-selection.png',
+        imageData: formData.toString('base64')
+      });
+      
+      // 4. Perform Dallas Tax Lookup for Real Results
+      console.log('📸 Performing Dallas tax lookup for real results');
+      await this.page.reload({ waitUntil: 'networkidle0' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Select Texas
+      await this.page.waitForSelector('select[id="state"]');
+      await this.page.select('select[id="state"]', 'TX');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Select Dallas County
+      await this.page.waitForSelector('select[id="county"]');
+      await this.page.select('select[id="county"]', 'dallas');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Select Dallas City
+      await this.page.waitForSelector('select[id="city"]');
+      await this.page.select('select[id="city"]', 'dallas');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Submit the form
+      await this.page.click('button[type="submit"]');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // 5. Capture Tax Results with Real Dallas Data
+      console.log('📸 Capturing: Real Dallas Tax Results');
+      const resultsPath = path.join(CONFIG.IMAGES_DIR, 'tax-results.png');
+      await this.page.screenshot({
+        path: resultsPath,
+        fullPage: false
+      });
+      const resultsData = await fs.readFile(resultsPath);
+      screenshots.push({
+        name: 'Tax Results Display - Dallas, TX',
+        path: 'tax-results.png',
+        imageData: resultsData.toString('base64')
+      });
+      
+      // 6. Focused Location Button Screenshot (highlighted)
+      console.log('📸 Capturing: Focused Location Button');
+      await this.page.setViewport(CONFIG.VIEWPORT);
+      await this.page.goto(CONFIG.APP_URL, { waitUntil: 'networkidle0' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Add highlighting to location button
+      await this.page.evaluate(() => {
+        const button = document.querySelector('button[class*="btn-primary"]');
+        if (button) {
+          button.style.outline = '4px solid #ff6b6b';
+          button.style.outlineOffset = '2px';
+          button.style.boxShadow = '0 0 0 8px rgba(255, 107, 107, 0.3)';
+          button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const buttonElement = await this.page.$('button[class*="btn-primary"]');
+      if (buttonElement) {
+        const buttonPath = path.join(CONFIG.IMAGES_DIR, 'location-button-highlighted.png');
+        await buttonElement.screenshot({
+          path: buttonPath,
+          padding: 50
+        });
+        const buttonData = await fs.readFile(buttonPath);
+        screenshots.push({
+          name: 'Location Detection Button (Highlighted)',
+          path: 'location-button-highlighted.png',
+          imageData: buttonData.toString('base64')
+        });
+      }
+      
+      // 7-9. iPad Landscape Views - Multiple focused screenshots
+      await this.page.setViewport(CONFIG.MOBILE_VIEWPORT);
+      await this.page.reload({ waitUntil: 'networkidle0' });
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // iPad Landscape - Homepage view (full page)
+      console.log('📸 Capturing: iPad Landscape Homepage');
+      const ipadHomePath = path.join(CONFIG.IMAGES_DIR, 'ipad-homepage.png');
+      await this.page.screenshot({
+        path: ipadHomePath,
+        fullPage: false
+      });
+      const ipadHomeData = await fs.readFile(ipadHomePath);
+      screenshots.push({
+        name: 'iPad View - Homepage',
+        path: 'ipad-homepage.png',
+        imageData: ipadHomeData.toString('base64')
+      });
+      
+      // iPad Landscape - Form focused view
+      console.log('📸 Capturing: iPad Landscape Form');
+      await this.page.evaluate(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const ipadFormPath = path.join(CONFIG.IMAGES_DIR, 'ipad-form.png');
+      await this.page.screenshot({
+        path: ipadFormPath,
+        fullPage: false
+      });
+      const ipadFormData = await fs.readFile(ipadFormPath);
+      screenshots.push({
+        name: 'iPad View - Selection Form',
+        path: 'ipad-form.png',
+        imageData: ipadFormData.toString('base64')
+      });
+      
+      // iPad Landscape - Results view (perform Dallas lookup)
+      console.log('📸 Capturing: iPad Landscape Results');
+      await this.page.reload({ waitUntil: 'networkidle0' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Select Texas, Dallas County, Dallas City for results
+      await this.page.waitForSelector('select[id="state"]');
+      await this.page.select('select[id="state"]', 'TX');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      await this.page.waitForSelector('select[id="county"]');
+      await this.page.select('select[id="county"]', 'dallas');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      await this.page.waitForSelector('select[id="city"]');
+      await this.page.select('select[id="city"]', 'dallas');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      await this.page.click('button[type="submit"]');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const ipadResultsPath = path.join(CONFIG.IMAGES_DIR, 'ipad-results.png');
+      await this.page.screenshot({
+        path: ipadResultsPath,
+        fullPage: false
+      });
+      const ipadResultsData = await fs.readFile(ipadResultsPath);
+      screenshots.push({
+        name: 'iPad View - Tax Results',
+        path: 'ipad-results.png',
+        imageData: ipadResultsData.toString('base64')
+      });
+      
+    } catch (error) {
+      console.error('Screenshot capture error:', error);
+      // Fall back to placeholder on error
+      screenshots.push({
+        name: 'Error - Using Placeholder',
+        path: 'placeholder'
+      });
+    }
+    
+    console.log(`📸 Captured ${screenshots.length} screenshots`);
     return screenshots;
   }
 
-  async generateHTML(screenshots) {
-    console.log('📝 Generating HTML content...');
+  async generateHTML(screenshots, isPDF = false) {
+    console.log('📝 Generating HTML content...', isPDF ? '(PDF version)' : '(Web version)');
     
     // Register Handlebars helpers
     handlebars.registerHelper('eq', function(a, b) {
       return a === b;
+    });
+    
+    handlebars.registerHelper('contains', function(str, substr) {
+      return str && str.includes && str.includes(substr);
     });
     
     // Read or create HTML template
@@ -108,11 +337,26 @@ class UserGuideGenerator {
       template = await fs.readFile(templatePath, 'utf8');
     } catch (error) {
       // Create default template
-      template = await this.createDefaultTemplate();
+      template = await this.createDefaultTemplate(isPDF);
       await fs.writeFile(templatePath, template);
     }
     
     const compile = handlebars.compile(template);
+    
+    // For PDF, use optimized smaller images by filtering out the largest ones
+    let optimizedScreenshots = screenshots;
+    if (isPDF) {
+      console.log('📄 Optimizing screenshots for PDF');
+      // For PDF, include key screenshots but exclude some duplicates
+      optimizedScreenshots = screenshots.filter(screenshot => {
+        const isEssential = screenshot.name.includes('Homepage') || 
+                          screenshot.name.includes('Tax Results') ||
+                          screenshot.name.includes('Highlighted') ||
+                          screenshot.name.includes('iPad View');
+        return isEssential;
+      });
+      console.log(`📄 PDF will include ${optimizedScreenshots.length} of ${screenshots.length} screenshots`);
+    }
     
     const data = {
       title: 'Tax Scanner v2 - User Guide',
@@ -120,14 +364,28 @@ class UserGuideGenerator {
       generatedDate: moment().format('MMMM Do, YYYY'),
       generatedTime: moment().format('h:mm A'),
       appUrl: CONFIG.APP_URL,
-      screenshots: screenshots,
-      year: new Date().getFullYear()
+      screenshots: isPDF ? optimizedScreenshots : screenshots,
+      year: 2025,
+      isPDF: isPDF
     };
+    
+    // Debug logging (only for web version to avoid spam)
+    if (!isPDF) {
+      console.log('📝 Template data - screenshots count:', screenshots.length);
+      screenshots.forEach((screenshot, index) => {
+        console.log(`📝 Screenshot ${index + 1}:`, {
+          name: screenshot.name,
+          path: screenshot.path,
+          hasImageData: !!screenshot.imageData,
+          imageDataLength: screenshot.imageData ? screenshot.imageData.length : 0
+        });
+      });
+    }
     
     return compile(data);
   }
 
-  async createDefaultTemplate() {
+  async createDefaultTemplate(isPDF) {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -197,6 +455,75 @@ class UserGuideGenerator {
             color: #374151;
             margin-top: 15px;
             font-size: 1.1em;
+        }
+        .mobile-screenshot {
+            margin: 15px 0;
+            padding: 15px;
+        }
+        .mobile-screenshot img {
+            border-radius: 15px !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        .mobile-screenshot .screenshot-caption {
+            margin-top: 10px;
+            font-size: 1em;
+        }
+        .mobile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 30px 0;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .mobile-column {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        .ipad-mockup {
+            position: relative;
+            background: #1f2937;
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin: 0 auto 15px;
+            width: fit-content;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border: 3px solid #374151;
+        }
+        .ipad-mockup::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 4px;
+        }
+        .ipad-mockup::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 3px;
+        }
+        .ipad-mockup img {
+            border-radius: 12px;
+            display: block;
+            max-width: 480px;
+            width: 480px;
+            height: auto;
+            border: 2px solid #4b5563;
         }
         .highlight-box {
             background: #ecfdf5;
@@ -328,13 +655,60 @@ class UserGuideGenerator {
         <h2>📱 See Tax Scanner in Action</h2>
         <p>Here's what Tax Scanner looks like when you use it. Don't worry if it looks different on your device – it automatically adjusts to fit your screen perfectly!</p>
         
+        {{#each screenshots}}
+        {{#if (contains name 'iPad View')}}
+        {{! iPad screenshots will be handled separately below }}
+        {{else}}
         <div class="screenshot">
+            {{#if imageData}}
+            <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" style="max-width: 100%; height: auto; {{#if ../isPDF}}max-height: 400px;{{/if}}" />
+            {{else}}
             <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 15px; padding: 60px 40px; text-align: center; color: #64748b; font-size: 1.1em;">
                 <div style="font-size: 3em; margin-bottom: 20px;">📱💻</div>
-                <strong>Screenshots Coming Soon!</strong><br>
-                <p style="margin: 10px 0; font-size: 0.95em;">We're working on adding helpful screenshots to show you exactly how Tax Scanner works. For now, you can visit <a href="{{appUrl}}" style="color: #2563eb;">{{appUrl}}</a> to see it in action!</p>
+                <strong>Screenshot Unavailable</strong><br>
+                <p style="margin: 10px 0; font-size: 0.95em;">Visit <a href="{{../appUrl}}" style="color: #2563eb;">{{../appUrl}}</a> to see it in action!</p>
             </div>
-            <div class="screenshot-caption">Tax Scanner Interface Preview</div>
+            {{/if}}
+            <div class="screenshot-caption">{{name}}</div>
+        </div>
+        {{/if}}
+        {{/each}}
+        
+        <div class="section">
+            <h2>📱 iPad Landscape Interface</h2>
+            <p>Here's how Tax Scanner looks and works on your iPad in landscape mode - it provides a desktop-like experience with bigger screens:</p>
+            
+            <div class="mobile-row">
+                {{#each screenshots}}
+                {{#if (contains name 'iPad View - Homepage')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 1: Homepage & Location</h3>
+                    <p>Full desktop-like layout on iPad landscape. Tap "Use My Current Location" for instant GPS detection, or use the dropdown menus below.</p>
+                </div>
+                {{/if}}
+                {{#if (contains name 'iPad View - Selection Form')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 2: Manual Selection</h3>
+                    <p>Choose your state, county, and city from the easy-to-use dropdown menus. The larger screen makes selection even easier.</p>
+                </div>
+                {{/if}}
+                {{#if (contains name 'iPad View - Tax Results')}}
+                <div class="mobile-column">
+                    <div class="ipad-mockup">
+                        <img src="data:image/png;base64,{{imageData}}" alt="{{name}}" />
+                    </div>
+                    <h3>Step 3: View Results</h3>
+                    <p>See your tax results in full detail on the larger iPad screen - perfect for business use with clear, readable information.</p>
+                </div>
+                {{/if}}
+                {{/each}}
+            </div>
         </div>
     </div>
 
@@ -542,34 +916,53 @@ class UserGuideGenerator {
 </html>`;
   }
 
-  async generatePDF(html) {
+  async generatePDF(screenshots) {
     console.log('📄 Generating PDF...');
     
-    // Launch browser just for PDF generation
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    
-    const pdfPath = path.join(CONFIG.OUTPUT_DIR, `tax-scanner-user-guide.pdf`);
-    
-    await page.pdf({
-      path: pdfPath,
-      ...CONFIG.PDF_OPTIONS
-    });
-    
-    await page.close();
-    await browser.close();
-    
-    console.log(`📄 PDF generated: ${pdfPath}`);
-    return pdfPath;
+    try {
+      // Generate PDF-specific HTML (uses file paths instead of base64)
+      const pdfHtml = await this.generateHTML(screenshots, true);
+      
+      // Launch browser just for PDF generation
+      const browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
+      });
+      
+      const page = await browser.newPage();
+      
+      // Set a longer timeout for PDF generation
+      page.setDefaultTimeout(60000);
+      
+      await page.setContent(pdfHtml, { waitUntil: 'networkidle0', timeout: 60000 });
+      
+      const pdfPath = path.join(CONFIG.OUTPUT_DIR, `tax-scanner-user-guide.pdf`);
+      
+      await page.pdf({
+        path: pdfPath,
+        ...CONFIG.PDF_OPTIONS,
+        timeout: 60000
+      });
+      
+      await page.close();
+      await browser.close();
+      
+      // Verify the PDF file exists and get its size
+      const stats = await fs.stat(pdfPath);
+      console.log(`📄 PDF generated successfully: ${pdfPath} (${Math.round(stats.size / 1024)}KB)`);
+      
+      return pdfPath;
+    } catch (error) {
+      console.error('❌ PDF generation failed:', error);
+      throw error;
+    }
   }
 
   async cleanup() {
-    // No persistent browser to clean up
+    if (this.browser) {
+      console.log('🧹 Closing browser...');
+      await this.browser.close();
+    }
     console.log('🧹 Cleanup completed');
   }
 
@@ -589,7 +982,22 @@ class UserGuideGenerator {
       console.log(`📝 HTML saved: ${htmlPath}`);
       
       // Generate PDF
-      const pdfPath = await this.generatePDF(html);
+      const pdfPath = await this.generatePDF(screenshots);
+      
+      // Copy PDF to frontend public directory for web access
+      const frontendPublicDir = path.join(__dirname, '..', 'frontend', 'public');
+      await fs.mkdir(frontendPublicDir, { recursive: true });
+      const publicPdfPath = path.join(frontendPublicDir, 'tax-scanner-user-guide.pdf');
+      
+      try {
+        await fs.copyFile(pdfPath, publicPdfPath);
+        const publicStats = await fs.stat(publicPdfPath);
+        console.log(`📄 PDF copied to public directory: ${publicPdfPath} (${Math.round(publicStats.size / 1024)}KB)`);
+        console.log(`📄 PDF will be available at: ${CONFIG.APP_URL}/tax-scanner-user-guide.pdf`);
+      } catch (copyError) {
+        console.error('❌ Failed to copy PDF to public directory:', copyError);
+        throw copyError;
+      }
       
       console.log('✅ User guide generation completed successfully!');
       console.log(`📊 Generated files:`);
