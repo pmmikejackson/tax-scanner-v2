@@ -5,6 +5,38 @@ All notable changes to Tax Scanner v2 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-05-30
+
+### 🎯 **MAJOR UI REDESIGN: Alphabetical State List**
+
+**✨ Complete Map Redesign Based on User Feedback:**
+- **Alphabetical Layout**: Replaced geographical grid with easy-to-navigate alphabetical list
+- **Rectangular State Boxes**: Uniform, clean rectangular design for all 50 states
+- **Improved Navigation**: States listed A-Z (Alabama → Wyoming) for instant location
+- **Enhanced Responsive Design**: 2-5 columns that adapt to screen size (mobile to desktop)
+- **Better Accessibility**: Larger click targets with clear state names and codes
+
+**🔧 Technical Improvements:**
+- **Complete State List**: All 50 states hardcoded with proper names and codes
+- **Simplified Code**: Removed complex grid positioning logic for maintainable alphabetical array
+- **Enhanced Styling**: Added borders, improved hover effects with scaling animation
+- **Better Typography**: State codes prominently displayed with full names beneath
+- **Performance**: Eliminated complex grid calculations for faster rendering
+
+**📱 User Experience:**
+- **Faster State Finding**: No more hunting through geographical positions
+- **Consistent Layout**: Every state gets equal visual prominence
+- **Mobile Friendly**: Better touch targets and responsive grid
+- **Clear Visual Hierarchy**: Bold state codes with descriptive full names
+
+### Status
+- ✅ **All 50 states** listed alphabetically
+- ✅ **Responsive grid** adapts to screen size
+- ✅ **Enhanced styling** with borders and improved hover effects
+- ✅ **Maintained functionality** - supported states still green and clickable
+
+---
+
 ## [0.3.0] - 2025-05-30
 
 ### 🎉 Major Features Added

@@ -1,19 +1,20 @@
 /**
  * USStatesMap Component
  * 
- * A grid-based interactive US states map for Tax Scanner v2
- * Displays all 50 US states in a geographical grid layout with visual feedback
+ * An alphabetical list-based interactive US states map for Tax Scanner v2
+ * Displays all 50 US states in alphabetical order with visual feedback
  * for supported vs. unsupported states.
  * 
  * Features:
- * - Grid layout that approximates US geographical positioning
+ * - Alphabetical list layout for easy navigation
+ * - Rectangular state boxes for consistent appearance
  * - Visual distinction between supported (green) and unsupported (gray) states
  * - Hover effects with state information tooltips
  * - Click handlers for supported states
- * - Separate positioning for Alaska and Hawaii
+ * - Responsive grid layout that adapts to screen size
  * - Legend showing state count and status
  * 
- * @version 0.3.0 - Grid layout implementation
+ * @version 0.4.0 - Alphabetical list implementation
  * @author Tax Scanner v2 Team
  * @since 0.3.0
  */
@@ -31,13 +32,70 @@ interface USStatesMapProps {
 /**
  * Interactive US States Map Component
  * 
- * Renders a grid-based map of US states with interactive features.
+ * Renders an alphabetical list of US states with interactive features.
  * Supported states are highlighted in green and clickable, while
  * unsupported states are shown in gray.
  */
 export default function USStatesMap({ onStateSelect, supportedStates, className = '' }: USStatesMapProps) {
   // State for tracking which state is currently being hovered
   const [hoveredState, setHoveredState] = useState<string | null>(null)
+
+  /**
+   * Complete list of all 50 US states with codes and full names
+   * Organized alphabetically by state name for easy navigation
+   */
+  const allStates = [
+    { code: 'AL', name: 'Alabama' },
+    { code: 'AK', name: 'Alaska' },
+    { code: 'AZ', name: 'Arizona' },
+    { code: 'AR', name: 'Arkansas' },
+    { code: 'CA', name: 'California' },
+    { code: 'CO', name: 'Colorado' },
+    { code: 'CT', name: 'Connecticut' },
+    { code: 'DE', name: 'Delaware' },
+    { code: 'FL', name: 'Florida' },
+    { code: 'GA', name: 'Georgia' },
+    { code: 'HI', name: 'Hawaii' },
+    { code: 'ID', name: 'Idaho' },
+    { code: 'IL', name: 'Illinois' },
+    { code: 'IN', name: 'Indiana' },
+    { code: 'IA', name: 'Iowa' },
+    { code: 'KS', name: 'Kansas' },
+    { code: 'KY', name: 'Kentucky' },
+    { code: 'LA', name: 'Louisiana' },
+    { code: 'ME', name: 'Maine' },
+    { code: 'MD', name: 'Maryland' },
+    { code: 'MA', name: 'Massachusetts' },
+    { code: 'MI', name: 'Michigan' },
+    { code: 'MN', name: 'Minnesota' },
+    { code: 'MS', name: 'Mississippi' },
+    { code: 'MO', name: 'Missouri' },
+    { code: 'MT', name: 'Montana' },
+    { code: 'NE', name: 'Nebraska' },
+    { code: 'NV', name: 'Nevada' },
+    { code: 'NH', name: 'New Hampshire' },
+    { code: 'NJ', name: 'New Jersey' },
+    { code: 'NM', name: 'New Mexico' },
+    { code: 'NY', name: 'New York' },
+    { code: 'NC', name: 'North Carolina' },
+    { code: 'ND', name: 'North Dakota' },
+    { code: 'OH', name: 'Ohio' },
+    { code: 'OK', name: 'Oklahoma' },
+    { code: 'OR', name: 'Oregon' },
+    { code: 'PA', name: 'Pennsylvania' },
+    { code: 'RI', name: 'Rhode Island' },
+    { code: 'SC', name: 'South Carolina' },
+    { code: 'SD', name: 'South Dakota' },
+    { code: 'TN', name: 'Tennessee' },
+    { code: 'TX', name: 'Texas' },
+    { code: 'UT', name: 'Utah' },
+    { code: 'VT', name: 'Vermont' },
+    { code: 'VA', name: 'Virginia' },
+    { code: 'WA', name: 'Washington' },
+    { code: 'WV', name: 'West Virginia' },
+    { code: 'WI', name: 'Wisconsin' },
+    { code: 'WY', name: 'Wyoming' }
+  ]
 
   /**
    * Check if a state is currently supported by the application
@@ -49,21 +107,12 @@ export default function USStatesMap({ onStateSelect, supportedStates, className 
   }
 
   /**
-   * Get the full name of a state from its code
-   * @param stateCode - Two-letter state code
-   * @returns Full state name or code if not found
-   */
-  const getStateName = (stateCode: string) => {
-    return supportedStates.find(state => state.code === stateCode)?.name || stateCode
-  }
-
-  /**
    * Handle state selection for supported states
    * @param stateCode - Two-letter state code
+   * @param stateName - Full state name
    */
-  const handleStateClick = (stateCode: string) => {
+  const handleStateClick = (stateCode: string, stateName: string) => {
     if (isSupported(stateCode)) {
-      const stateName = getStateName(stateCode)
       onStateSelect(stateCode, stateName)
     }
   }
@@ -71,7 +120,7 @@ export default function USStatesMap({ onStateSelect, supportedStates, className 
   /**
    * Generate Tailwind CSS classes for state styling based on support status
    * @param stateCode - Two-letter state code
-   * @returns CSS class string for the state
+   * @returns CSS class string for the state box
    */
   const getStateStyle = (stateCode: string) => {
     const supported = isSupported(stateCode)
@@ -80,127 +129,61 @@ export default function USStatesMap({ onStateSelect, supportedStates, className 
     if (supported) {
       // Green styling for supported states with hover effects
       return `
-        ${hovered ? 'bg-emerald-600' : 'bg-emerald-500'} 
+        ${hovered ? 'bg-emerald-600 scale-105' : 'bg-emerald-500'} 
         text-white cursor-pointer shadow-md hover:shadow-lg 
-        transform hover:scale-105 transition-all duration-200
+        transform transition-all duration-200 border-2 border-emerald-600
       `
     } else {
       // Gray styling for unsupported states
       return `
         bg-gray-200 text-gray-500 cursor-not-allowed 
-        opacity-70
+        opacity-70 border-2 border-gray-300
+        ${hovered ? 'bg-gray-300' : ''}
+        transition-all duration-200
       `
     }
   }
-
-  /**
-   * US States Grid Layout
-   * 
-   * Organized in a 7x7 grid that roughly approximates the geographical
-   * layout of the United States. Each row represents a latitude band,
-   * with states positioned to maintain recognizable geographical relationships.
-   * 
-   * null values represent empty grid spaces (ocean, Canada, Mexico)
-   * Alaska and Hawaii are positioned separately below the main grid
-   */
-  const stateGrid = [
-    // Row 1 - Northernmost states (Maine, northern border)
-    [null, null, null, null, null, 'ME', null],
-    
-    // Row 2 - Northern tier states
-    [null, 'WA', 'ID', 'MT', 'ND', 'MN', 'WI', 'MI', null, 'VT', 'NH'],
-    
-    // Row 3 - Northern central states
-    ['OR', null, 'WY', 'SD', 'IA', 'IL', 'IN', 'OH', 'PA', 'NY', 'MA', 'CT', 'RI'],
-    
-    // Row 4 - Central states
-    ['CA', 'NV', 'UT', 'CO', 'NE', 'MO', 'KY', 'WV', 'VA', 'MD', 'DE', 'NJ'],
-    
-    // Row 5 - Southern central states
-    [null, 'AZ', 'NM', 'KS', 'AR', 'TN', 'NC', null],
-    
-    // Row 6 - Southern states
-    [null, null, null, 'OK', 'LA', 'MS', 'AL', 'GA', 'SC'],
-    
-    // Row 7 - Southernmost states
-    [null, null, null, 'TX', null, null, null, 'FL'],
-  ]
 
   return (
     <div className={`w-full ${className}`}>
       <div className="bg-gradient-to-b from-blue-50 to-blue-100 p-8 rounded-xl shadow-inner">
         
-        {/* Main US Map Grid */}
-        <div className="flex flex-col items-center space-y-2 mb-8">
-          {stateGrid.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex space-x-2">
-              {row.map((state, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className="w-12 h-8 flex items-center justify-center"
-                >
-                  {state ? (
-                    <div
-                      className={`
-                        w-full h-full rounded text-xs font-bold 
-                        flex items-center justify-center
-                        ${getStateStyle(state)}
-                      `}
-                      onMouseEnter={() => setHoveredState(state)}
-                      onMouseLeave={() => setHoveredState(null)}
-                      onClick={() => handleStateClick(state)}
-                      title={state}
-                    >
-                      {state}
-                    </div>
-                  ) : (
-                    <div className="w-full h-full"></div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your State</h2>
+          <p className="text-gray-600">Choose from all 50 US states - supported states are highlighted in green</p>
         </div>
 
-        {/* Alaska and Hawaii */}
-        <div className="flex justify-center space-x-8 mt-4">
-          <div
-            className={`
-              w-16 h-12 rounded text-xs font-bold 
-              flex items-center justify-center
-              ${getStateStyle('AK')}
-            `}
-            onMouseEnter={() => setHoveredState('AK')}
-            onMouseLeave={() => setHoveredState(null)}
-            onClick={() => handleStateClick('AK')}
-            title="Alaska"
-          >
-            AK
-          </div>
-          <div
-            className={`
-              w-16 h-12 rounded text-xs font-bold 
-              flex items-center justify-center
-              ${getStateStyle('HI')}
-            `}
-            onMouseEnter={() => setHoveredState('HI')}
-            onMouseLeave={() => setHoveredState(null)}
-            onClick={() => handleStateClick('HI')}
-            title="Hawaii"
-          >
-            HI
-          </div>
+        {/* Alphabetical States Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-8">
+          {allStates.map((state) => (
+            <div
+              key={state.code}
+              className={`
+                p-4 rounded-lg text-center font-semibold text-sm
+                min-h-[60px] flex flex-col items-center justify-center
+                ${getStateStyle(state.code)}
+              `}
+              onMouseEnter={() => setHoveredState(state.code)}
+              onMouseLeave={() => setHoveredState(null)}
+              onClick={() => handleStateClick(state.code, state.name)}
+              title={`${state.name} (${state.code})`}
+            >
+              <div className="font-bold text-lg">{state.code}</div>
+              <div className="text-xs opacity-90 leading-tight">{state.name}</div>
+            </div>
+          ))}
         </div>
       </div>
       
       {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-6 justify-center text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 bg-emerald-500 rounded-md shadow-sm"></div>
+          <div className="w-5 h-5 bg-emerald-500 rounded-md shadow-sm border border-emerald-600"></div>
           <span className="text-gray-700 font-medium">Supported States ({supportedStates.length})</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 bg-gray-200 rounded-md shadow-sm"></div>
+          <div className="w-5 h-5 bg-gray-200 rounded-md shadow-sm border border-gray-300"></div>
           <span className="text-gray-500">Coming Soon ({50 - supportedStates.length} states)</span>
         </div>
       </div>
@@ -212,13 +195,13 @@ export default function USStatesMap({ onStateSelect, supportedStates, className 
             <p className="text-sm font-medium">
               {isSupported(hoveredState) ? (
                 <span className="text-emerald-600">
-                  ✅ <span className="font-bold text-lg">{getStateName(hoveredState)}</span>
+                  ✅ <span className="font-bold text-lg">{allStates.find(s => s.code === hoveredState)?.name}</span>
                   <br />
                   <span className="text-sm">Click to view tax rates</span>
                 </span>
               ) : (
                 <span className="text-gray-500">
-                  🚧 <span className="font-bold text-lg">{hoveredState}</span>
+                  🚧 <span className="font-bold text-lg">{allStates.find(s => s.code === hoveredState)?.name}</span>
                   <br />
                   <span className="text-sm">Coming soon!</span>
                 </span>

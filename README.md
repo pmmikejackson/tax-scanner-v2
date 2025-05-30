@@ -1,16 +1,17 @@
 # Tax Scanner v2
 
-**Version 0.3.0** - A modular web application for looking up sales tax rates for restaurants by state, county, and city.
+**Version 0.4.0** - A modular web application for looking up sales tax rates for restaurants by state, county, and city.
 
 ## 🗺️ Interactive US States Map
 
-Tax Scanner v2 now features a beautiful, interactive map interface that makes selecting your state intuitive and engaging:
+Tax Scanner v2 features a clean, alphabetical list interface that makes finding your state quick and easy:
 
-- **Grid-based layout** that resembles the actual US geography
+- **Alphabetical layout** with all 50 states listed A-Z for instant navigation
+- **Rectangular state boxes** with consistent, professional appearance
 - **Visual state indicators**: Supported states in green, coming soon in gray
-- **Hover effects** with state information and status
-- **Mobile-friendly** responsive design
-- **Immediate feedback** for supported vs. unsupported states
+- **Hover effects** with state information and status tooltips
+- **Mobile-friendly** responsive design that adapts from 2 to 5 columns
+- **Large click targets** for easy selection on any device
 
 ### Currently Supported States
 - ✅ **Texas (TX)** - Complete city and county coverage
@@ -37,23 +38,19 @@ This project uses a modular architecture to ensure maintainability and scalabili
 - 🎨 Modern, responsive UI with smooth animations
 - ♿ Accessibility-focused design with keyboard navigation
 
-## Latest Updates (v0.3.0)
+## Latest Updates (v0.4.0)
 
-### 🎉 New Interactive Map
-- Complete redesign of the state selection interface
-- Grid layout that matches US geography
-- Visual feedback for state support status
-- Smooth hover effects and transitions
-
-### 🐛 Bug Fixes
-- Fixed infinite loading spinner issue
-- Improved API error handling
-- Enhanced mobile responsiveness
+### 🎯 Major UI Redesign
+- Complete redesign from geographical grid to alphabetical list
+- All 50 states displayed in easy-to-scan rectangular boxes
+- Improved mobile responsiveness and accessibility
+- Faster state location with alphabetical ordering
 
 ### 🔧 Technical Improvements
-- Comprehensive code documentation
+- Simplified codebase with better maintainability
+- Enhanced styling with borders and improved animations
+- Better responsive grid system
 - Performance optimizations
-- Better state management
 
 ## Quick Start
 
